@@ -1,0 +1,21 @@
+#!/usr/bin/make -f
+
+# Test for https://pad.lv/2100266 regression
+
+include /usr/share/dpkg/pkg-info.mk
+
+SED_VERSION_SHORT := sed -re 's/([^.]+)\.([^.]+)\..*/\1.\2/'
+RUST_VERSION := $(shell echo '$(DEB_VERSION_UPSTREAM)' | $(SED_VERSION_SHORT))
+
+VERSIONED_CARGO := /usr/lib/rust-$(RUST_VERSION)/bin/cargo
+CARGO_WRAPPER := /usr/lib/rust-$(RUST_VERSION)/share/cargo/bin/cargo
+
+.PHONY: run-test
+run-test:
+	@set -e; \
+	VERSIONED_VER="$$( $(VERSIONED_CARGO) --version 2>&1 )"; \
+	WRAPPER_VER="$$( $(CARGO_WRAPPER) --version 2>&1 )"; \
+	if [ "$$VERSIONED_VER" != "$$WRAPPER_VER" ]; then \
+		echo "Error: cargo wrapper version '$$WRAPPER_VER' != actual version '$$VERSIONED_VER'" >&2; \
+		exit 1; \
+	fi

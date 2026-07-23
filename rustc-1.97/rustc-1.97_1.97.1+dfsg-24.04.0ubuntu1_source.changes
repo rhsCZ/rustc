@@ -1,0 +1,57 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Sun, 19 Jul 2026 12:00:00 +0200
+Source: rustc-1.97
+Built-For-Profiles: noudeb
+Architecture: source
+Version: 1.97.1+dfsg-24.04.0ubuntu1
+Distribution: noble
+Urgency: medium
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Changed-By: Jan Hodouš <rhscz@post.cz>
+Changes:
+ rustc-1.97 (1.97.1+dfsg-24.04.0ubuntu1) noble; urgency=medium
+ .
+   * Rebase Ubuntu rustc packaging onto upstream 1.97.1.
+   * Carry forward the 1.97.0 Debian/Ubuntu packaging as the initial 1.97.1
+     base.
+   * Refresh vendored source metadata and patch applicability for the 1.97.1
+     upstream snapshot.
+Checksums-Sha1:
+ 4c56c2e4affa35f30b837b3389a38c465d1dd4ba 24323 rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1.dsc
+ d1e3f9a93057cf8f36406b8a1ddb0fc4170d14f1 54904296 rustc-1.97_1.97.1+dfsg.orig-vendor.tar.xz
+ 90c012d3e2cc07d1066d508484ac5f4b97cf7146 55995008 rustc-1.97_1.97.1+dfsg.orig.tar.xz
+ f7b7e9415049250ac1c307a44fde2bc123acb117 149600 rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1.debian.tar.xz
+ 7f1e5ccc085dd4c64990b0400019bafd6bcc5f94 10167 rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1_source.buildinfo
+Checksums-Sha256:
+ 3d5f014568f12327463079e77acdf7bf2edec6f0560e927c92a6d9444f13a6c0 24323 rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1.dsc
+ 55d588bf430a3df0a0bb9af6577f8379dcc657f220e54c0b6e0957354f51d6b8 54904296 rustc-1.97_1.97.1+dfsg.orig-vendor.tar.xz
+ 011a3bc24894945857505cca36979b269a230c5d0ffd3c6f3042cca1ec6c1456 55995008 rustc-1.97_1.97.1+dfsg.orig.tar.xz
+ 66f8c2f90a44a7f838c4bc5f19c9190728a2d340cf6cce5e76b3636eba0d2894 149600 rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1.debian.tar.xz
+ a1f5999acfb4d44eceb112790352ca74e76fb7cb6a4f62abe359e500e97669a8 10167 rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1_source.buildinfo
+Files:
+ cb24b4ad5ef91fc805b1bf90b8be21bb 24323 devel optional rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1.dsc
+ ccd45c5948c50b6aaa4a689c5ea0a4d1 54904296 devel optional rustc-1.97_1.97.1+dfsg.orig-vendor.tar.xz
+ 38bb1dbf9a75e553c57eaf77c5145c54 55995008 devel optional rustc-1.97_1.97.1+dfsg.orig.tar.xz
+ 44c232af0e0d8609f14078b54160a079 149600 devel optional rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1.debian.tar.xz
+ 0937433ca7a7b66797f4bb36f70b77db 10167 devel optional rustc-1.97_1.97.1+dfsg-24.04.0ubuntu1_source.buildinfo
+Original-Maintainer: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmpcxSEACgkQbjGunhIC
+qWBwvg//XlqcmedjTeY9Ob72EL6qtvUa82qIPVCfWw+mO0+SjtTNuJjeRgJ+Yb/H
+P8oLdStjR6E4ja1bLuXowS5cvggvJ41cu6Yhho/TJEv3zgu4v5XCIjW+Jm11rysP
+FdNFRq7+AUV1PZt10UNwF8KJieiRGTIYH3VcC9XBs7Hys+NMzdc9Zmm+N6RTB2yW
+ei90JH3bnlpIZGrCLymJUbQX/ohPAdxfBufvcGTuBjTGZMWLpeCvSuzvxHjUso9r
+2SOSoeFpenVZpyEixucxsDpzcJftwPJglTd9G7SnECDzHXiGPEbVO/XS4RSWBCZR
+ndggXjq9SuqdcrjIazHu4SGQ/QEFirww4YumA9FFxFOp79d7/b4DHgkOKBWG+R9j
+10pX5I15lYBprMCDxnmpHsEfYp5CI72+FmMxo//yMmhFK+jDOKAYQpb0tlYiD2lI
+gbw9csiOrH0rTqJcQ9GRK3U9RWFeSy2cpPuguM3Cc2LUapJcuLXQh2PIc4UU02Hv
+zoyEEkSoBalKUhAEMda68F9gtcQXUJklaSiKB7FQeozZMz0HooS5/F57/bbcERif
+bJ2i/86myqj5Fql2j0xlVWTnj3vR0Trmt4jDoSqio9XFxBvHwvtRrwH8gOfcSQPe
+0YiCm4AObTtVq3EdC53I0Ur5d1uTKzqIxDUtnYD4r7PQnK6ZSM8=
+=+E08
+-----END PGP SIGNATURE-----

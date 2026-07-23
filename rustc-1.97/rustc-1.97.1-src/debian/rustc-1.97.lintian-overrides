@@ -1,0 +1,7 @@
+# unofficial example script, no dependency needed
+rustc-1.97 binary: missing-dep-for-interpreter /usr/bin/node (does not satisfy nodejs:any) [usr/share/rustc/bin/wasi-node]
+
+# symlinks to other programs
+rustc-1.97 binary: no-manual-page [usr/bin/rust-1.97-clang]
+rustc-1.97 binary: no-manual-page [usr/bin/rust-1.97-lld]
+rustc-1.97 binary: no-manual-page [usr/bin/rust-1.97-llvm-dwp]

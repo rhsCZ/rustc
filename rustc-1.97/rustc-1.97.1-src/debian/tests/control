@@ -1,0 +1,26 @@
+Test-Command: ./debian/rules build RUST_TEST_SELFBUILD=1
+Depends: @, @builddeps@
+Restrictions: rw-build-tree, allow-stderr
+
+Tests: create-and-build-crate
+Restrictions: allow-stderr
+Depends: @
+
+Tests: versioned-cargo-wrapper
+Depends: @, cargo
+
+Tests: build-std
+Restrictions: allow-stderr
+Depends: @
+
+Tests: git-repo-test
+Depends: @, git
+Restrictions: allow-stderr
+
+Tests: rust-miri-test
+Depends: @
+Restrictions: allow-stderr
+
+Tests: full-versioned-build
+Depends: @, librust-anyhow-dev
+Restrictions: allow-stderr

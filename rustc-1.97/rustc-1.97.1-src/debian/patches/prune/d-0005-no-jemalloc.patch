@@ -1,0 +1,75 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Sat, 2 Oct 2021 01:08:00 +0100
+Subject: d-0005-no-jemalloc
+
+Description: remove jemalloc-sys
+
+Forwarded: not-needed
+---
+ compiler/rustc/Cargo.toml                         | 6 ------
+ src/tools/rust-analyzer/crates/profile/Cargo.toml | 2 --
+ 2 files changed, 8 deletions(-)
+
+Index: rustc-1.97.0-src/compiler/rustc/Cargo.toml
+===================================================================
+--- rustc-1.97.0-src.orig/compiler/rustc/Cargo.toml
++++ rustc-1.97.0-src/compiler/rustc/Cargo.toml
+@@ -27,15 +27,9 @@ getrandom = "=0.3.3"
+ wasi = "=0.14.2"
+ 
+ 
+-[dependencies.tikv-jemalloc-sys]
+-version = "0.6.1"
+-optional = true
+-features = ['override_allocator_on_supported_platforms']
+-
+ [features]
+ # tidy-alphabetical-start
+ check_only = ['rustc_driver_impl/check_only']
+-jemalloc = ['dep:tikv-jemalloc-sys']
+ llvm = ['rustc_driver_impl/llvm']
+ llvm_enzyme = ['rustc_driver_impl/llvm_enzyme']
+ llvm_offload = ['rustc_driver_impl/llvm_offload']
+Index: rustc-1.97.0-src/src/tools/rust-analyzer/crates/profile/Cargo.toml
+===================================================================
+--- rustc-1.97.0-src.orig/src/tools/rust-analyzer/crates/profile/Cargo.toml
++++ rustc-1.97.0-src/src/tools/rust-analyzer/crates/profile/Cargo.toml
+@@ -14,7 +14,6 @@ doctest = false
+ 
+ [dependencies]
+ cfg-if = "1.0.1"
+-jemalloc-ctl = { version = "0.5.4", package = "tikv-jemalloc-ctl", optional = true }
+ 
+ [target.'cfg(all(target_os = "linux", not(target_env = "ohos"), any(target_arch = "x86", target_arch = "x86_64", target_arch = "aarch64")))'.dependencies]
+ perf-event = "=0.4.8"
+@@ -30,7 +29,6 @@ windows-sys = { version = "0.60", featur
+ 
+ [features]
+ cpu_profiler = []
+-jemalloc = ["jemalloc-ctl"]
+ 
+ # Uncomment to enable for the whole crate graph
+ # default = [ "cpu_profiler" ]
+Index: rustc-1.97.0-src/src/tools/rust-analyzer/crates/rust-analyzer/Cargo.toml
+===================================================================
+--- rustc-1.97.0-src.orig/src/tools/rust-analyzer/crates/rust-analyzer/Cargo.toml
++++ rustc-1.97.0-src/src/tools/rust-analyzer/crates/rust-analyzer/Cargo.toml
+@@ -83,9 +83,6 @@ windows-sys = { version = "0.60", featur
+   "Win32_System_Threading",
+ ] }
+ 
+-[target.'cfg(not(target_env = "msvc"))'.dependencies]
+-jemallocator = { version = "0.5.4", package = "tikv-jemallocator", optional = true }
+-
+ [dev-dependencies]
+ expect-test = "1.5.1"
+ xshell.workspace = true
+@@ -97,7 +94,7 @@ syntax-bridge.workspace = true
+ intern = { path = "../intern", features = ["prevent-gc"] }
+ 
+ [features]
+-jemalloc = ["jemallocator", "profile/jemalloc"]
++jemalloc = []
+ force-always-assert = ["stdx/force-always-assert"]
+ in-rust-tree = [
+   "cfg/in-rust-tree",
