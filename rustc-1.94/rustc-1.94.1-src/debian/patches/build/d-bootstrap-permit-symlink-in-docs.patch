@@ -1,0 +1,19 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Thu, 13 Jun 2024 11:16:40 +0200
+Subject: partial revert of b9eedea4b0368fd1f00f204db75109ff444fab5b upstream
+
+Forwarded: not-needed
+---
+ src/bootstrap/src/core/build_steps/dist.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/bootstrap/src/core/build_steps/dist.rs
++++ b/src/bootstrap/src/core/build_steps/dist.rs
+@@ -94,6 +94,7 @@
+         tarball.add_bulk_dir(builder.doc_out(host), dest);
+         tarball.add_file(builder.src.join("src/doc/robots.txt"), dest, FileType::Regular);
+         tarball.add_file(builder.src.join("src/doc/sitemap.txt"), dest, FileType::Regular);
++        tarball.permit_symlinks(true);
+         Some(tarball.generate())
+     }
+ 

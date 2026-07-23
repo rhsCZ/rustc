@@ -1,0 +1,27 @@
+Description: Use system compiler during tests
+ The tests use a default configuration which strips the rustc and cargo
+ variables, and it will try to download CI prebuilt binaries, making the
+ tests unable to pass.
+Author: Zixing Liu <zixing.liu@canonical.com>
+Forwarded: not-needed
+Last-Update: 2023-07-18
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/bootstrap/src/core/config/config.rs
++++ b/src/bootstrap/src/core/config/config.rs
+@@ -743,7 +743,6 @@
+         };
+ 
+         let initial_rustc = build_rustc.unwrap_or_else(|| {
+-            download_beta_toolchain(&dwn_ctx, &out);
+             default_stage0_rustc_path(&out)
+         });
+ 
+@@ -757,7 +756,6 @@
+         ));
+ 
+         let initial_cargo = build_cargo.unwrap_or_else(|| {
+-            download_beta_toolchain(&dwn_ctx, &out);
+             initial_sysroot.join("bin").join(exe("cargo", host_target))
+         });
+ 

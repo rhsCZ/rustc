@@ -1,0 +1,69 @@
+[dependencies.core]
+optional = true
+package = "rustc-std-workspace-core"
+version = "1.0.0"
+
+[dependencies.gimli]
+default-features = false
+features = ["read-core"]
+version = "0.32"
+
+[dependencies.libc]
+optional = true
+version = "0.2"
+
+[dependencies.spin]
+default-features = false
+features = ["mutex", "spin_mutex"]
+optional = true
+version = "0.9.8"
+
+[features]
+alloc = []
+default = ["unwinder", "dwarf-expr", "hide-trace", "fde-phdr-dl", "fde-registry"]
+dwarf-expr = []
+fde-custom = []
+fde-gnu-eh-frame-hdr = []
+fde-phdr = ["libc"]
+fde-phdr-aux = ["fde-phdr"]
+fde-phdr-dl = ["fde-phdr"]
+fde-registry = ["alloc"]
+fde-static = []
+hide-trace = []
+libc = ["dep:libc"]
+panic = ["panicking", "alloc"]
+panic-handler = ["print", "panic"]
+panic-handler-dummy = []
+panicking = []
+personality = []
+personality-dummy = []
+print = ["libc"]
+rustc-dep-of-std = ["dep:core", "gimli/rustc-dep-of-std"]
+spin = ["dep:spin"]
+system-alloc = []
+unwinder = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Gary Guo <gary@garyguo.net>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+description = "Unwinding library in Rust and for Rust"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+name = "unwinding"
+readme = "README.md"
+repository = "https://github.com/nbdd0121/unwinding/"
+rust-version = "1.88"
+version = "0.2.8"
+
+[package.metadata.docs.rs]
+features = ["panic-handler"]
+
+[profile.release]
+debug = 2

@@ -1,0 +1,106 @@
+[dependencies.bitflags]
+default-features = false
+features = ["std"]
+optional = true
+version = "2.5.0"
+
+[dependencies.block2]
+default-features = false
+features = ["alloc"]
+optional = true
+version = ">=0.6.1, <0.8.0"
+
+[dependencies.libc]
+default-features = false
+optional = true
+version = "0.2.80"
+
+[dependencies.objc2]
+default-features = false
+features = ["std"]
+optional = true
+version = ">=0.6.2, <0.8.0"
+
+[dependencies.objc2-core-foundation]
+default-features = false
+version = "0.3.2"
+
+[dependencies.objc2-core-graphics]
+default-features = false
+features = ["CGContext", "CGFont", "CGImage", "CGPath"]
+optional = true
+version = "0.3.2"
+
+[dev-dependencies.static_assertions]
+version = "1.1.0"
+
+[features]
+CTDefines = []
+CTFont = ["bitflags", "objc2-core-foundation/CFArray", "objc2-core-foundation/CFCGTypes", "objc2-core-foundation/CFCharacterSet", "objc2-core-foundation/CFData", "objc2-core-foundation/CFDictionary", "objc2-core-foundation/CFString"]
+CTFontCollection = ["bitflags", "objc2-core-foundation/CFArray", "objc2-core-foundation/CFDictionary", "objc2-core-foundation/CFSet"]
+CTFontDescriptor = ["objc2-core-foundation/CFArray", "objc2-core-foundation/CFCGTypes", "objc2-core-foundation/CFDictionary", "objc2-core-foundation/CFNumber", "objc2-core-foundation/CFSet"]
+CTFontManager = ["objc2-core-foundation/CFArray", "objc2-core-foundation/CFBundle", "objc2-core-foundation/CFData", "objc2-core-foundation/CFDictionary", "objc2-core-foundation/CFError", "objc2-core-foundation/CFRunLoop", "objc2-core-foundation/CFURL"]
+CTFontManagerErrors = []
+CTFontTraits = ["bitflags"]
+CTFrame = ["objc2-core-foundation/CFArray", "objc2-core-foundation/CFCGTypes", "objc2-core-foundation/CFDictionary"]
+CTFramesetter = ["objc2-core-foundation/CFAttributedString", "objc2-core-foundation/CFCGTypes", "objc2-core-foundation/CFDictionary"]
+CTGlyphInfo = []
+CTLine = ["bitflags", "objc2-core-foundation/CFArray", "objc2-core-foundation/CFAttributedString", "objc2-core-foundation/CFCGTypes"]
+CTParagraphStyle = []
+CTRubyAnnotation = ["objc2-core-foundation/CFCGTypes", "objc2-core-foundation/CFDictionary"]
+CTRun = ["bitflags", "objc2-core-foundation/CFCGTypes", "objc2-core-foundation/CFDictionary"]
+CTRunDelegate = ["objc2-core-foundation/CFCGTypes"]
+CTStringAttributes = ["bitflags"]
+CTTextTab = ["objc2-core-foundation/CFDictionary"]
+CTTypesetter = ["objc2-core-foundation/CFAttributedString", "objc2-core-foundation/CFDictionary"]
+SFNTLayoutTypes = []
+SFNTTypes = []
+alloc = []
+bitflags = ["dep:bitflags"]
+block2 = ["dep:block2"]
+default = ["std", "CTDefines", "CTFont", "CTFontCollection", "CTFontDescriptor", "CTFontManager", "CTFontManagerErrors", "CTFontTraits", "CTFrame", "CTFramesetter", "CTGlyphInfo", "CTLine", "CTParagraphStyle", "CTRubyAnnotation", "CTRun", "CTRunDelegate", "CTStringAttributes", "CTTextTab", "CTTypesetter", "SFNTLayoutTypes", "SFNTTypes", "bitflags", "block2", "libc", "objc2", "objc2-core-graphics"]
+libc = ["dep:libc"]
+objc2 = ["dep:objc2", "objc2-core-foundation/objc2", "objc2-core-graphics?/objc2"]
+objc2-core-graphics = ["dep:objc2-core-graphics"]
+std = ["alloc"]
+unstable-darwin-objc = []
+
+[lib]
+path = "src/lib.rs"
+
+[lints.clippy]
+ptr_as_ptr = "warn"
+redundant_feature_names = "allow"
+
+[lints.clippy.cargo]
+level = "warn"
+priority = -1
+
+[lints.rust]
+elided_lifetimes_in_paths = "warn"
+missing_copy_implementations = "warn"
+non_ascii_idents = "deny"
+unreachable_pub = "warn"
+unsafe_op_in_unsafe_fn = "deny"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["api-bindings", "development-tools::ffi", "external-ffi-bindings", "os::macos-apis"]
+description = "Bindings to the CoreText framework"
+edition = "2021"
+keywords = ["cocoa", "apple", "framework", "macos", "ios"]
+license = "Zlib OR Apache-2.0 OR MIT"
+name = "objc2-core-text"
+readme = "README.md"
+repository = "https://github.com/madsmtm/objc2"
+rust-version = "1.71"
+version = "0.3.2"
+
+[package.metadata.docs.rs]
+default-target = "aarch64-apple-darwin"
+rustc-args = ["--cfg", "docsrs"]
+targets = ["aarch64-apple-darwin", "x86_64-apple-darwin", "aarch64-apple-ios", "aarch64-apple-tvos", "aarch64-apple-watchos", "aarch64-apple-ios-macabi", "aarch64-apple-visionos"]

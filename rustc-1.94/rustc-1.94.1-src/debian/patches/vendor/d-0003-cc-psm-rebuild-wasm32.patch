@@ -1,0 +1,45 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Sat, 2 Oct 2021 01:08:00 +0100
+Subject: d-0003-cc-psm-rebuild-wasm32
+
+Forwarded: not-needed
+---
+ vendor/cc-1.0.97/src/lib.rs | 2 +-
+ vendor/psm-0.1.21/build.rs  | 7 ++-----
+ 2 files changed, 3 insertions(+), 6 deletions(-)
+
+--- a/vendor/cc-1.2.0/src/lib.rs
++++ b/vendor/cc-1.2.0/src/lib.rs
+@@ -2623,7 +2623,7 @@
+         let (env, msvc, gnu, traditional, clang) = if self.cpp {
+             ("CXX", "cl.exe", "g++", "c++", "clang++")
+         } else {
+-            ("CC", "cl.exe", "gcc", "cc", "clang")
++            ("CC", "cl.exe", "gcc", "cc", "rust-clang")
+         };
+ 
+         // On historical Solaris systems, "cc" may have been Sun Studio, which
+--- a/vendor/psm-0.1.26/build.rs
++++ b/vendor/psm-0.1.26/build.rs
+@@ -51,7 +51,7 @@
+         ("sparc", _, _, _) => Some(("src/arch/sparc_sysv.s", true)),
+         ("riscv32", _, _, _) => Some(("src/arch/riscv.s", true)),
+         ("riscv64", _, _, _) => Some(("src/arch/riscv64.s", true)),
+-        ("wasm32", _, _, _) => Some(("src/arch/wasm32.o", true)),
++        ("wasm32", _, _, _) => Some(("src/arch/wasm32.s", true)),
+         ("loongarch64", _, _, _) => Some(("src/arch/loongarch64.s", true)),
+         _ => None,
+     }
+@@ -106,11 +106,8 @@
+         cfg.define(&*format!("CFG_TARGET_ENV_{}", env), None);
+     }
+ 
+-    // For wasm targets we ship a precompiled `*.o` file so we just pass that
+-    // directly to `ar` to assemble an archive. Otherwise we're actually
+-    // compiling the source assembly file.
+     if asm.ends_with(".o") {
+-        cfg.object(asm);
++        panic!("Debian does not allow embedded object files in source code")
+     } else {
+         cfg.file(asm);
+     }

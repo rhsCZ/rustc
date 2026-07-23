@@ -1,0 +1,105 @@
+[dependencies.http]
+version = "1"
+
+[dependencies.hyper]
+default-features = false
+version = "1"
+
+[dependencies.hyper-util]
+default-features = false
+features = ["client-legacy", "tokio"]
+version = "0.1"
+
+[dependencies.log]
+optional = true
+version = "0.4.4"
+
+[dependencies.pki-types]
+package = "rustls-pki-types"
+version = "1"
+
+[dependencies.rustls]
+default-features = false
+version = "0.23"
+
+[dependencies.rustls-native-certs]
+optional = true
+version = "0.8"
+
+[dependencies.rustls-platform-verifier]
+optional = true
+version = "0.6"
+
+[dependencies.tokio]
+version = "1.0"
+
+[dependencies.tokio-rustls]
+default-features = false
+version = "0.26"
+
+[dependencies.tower-service]
+version = "0.3"
+
+[dependencies.webpki-roots]
+optional = true
+version = "1"
+
+[dev-dependencies.cfg-if]
+version = "1"
+
+[dev-dependencies.http-body-util]
+version = "0.1"
+
+[dev-dependencies.hyper-util]
+default-features = false
+features = ["server-auto"]
+version = "0.1"
+
+[dev-dependencies.rustls]
+default-features = false
+features = ["tls12"]
+version = "0.23"
+
+[dev-dependencies.rustls-pemfile]
+version = "2"
+
+[dev-dependencies.tokio]
+features = ["io-std", "macros", "net", "rt-multi-thread"]
+version = "1.0"
+
+[features]
+aws-lc-rs = ["rustls/aws_lc_rs"]
+default = ["native-tokio", "http1", "tls12", "logging", "aws-lc-rs"]
+fips = ["aws-lc-rs", "rustls/fips"]
+http1 = ["hyper-util/http1"]
+http2 = ["hyper-util/http2"]
+logging = ["log", "tokio-rustls/logging", "rustls/logging"]
+native-tokio = ["rustls-native-certs"]
+ring = ["rustls/ring"]
+tls12 = ["tokio-rustls/tls12", "rustls/tls12"]
+webpki-tokio = ["webpki-roots"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+description = "Rustls+hyper integration for pure rust HTTPS"
+documentation = "https://docs.rs/hyper-rustls/"
+edition = "2021"
+homepage = "https://github.com/rustls/hyper-rustls"
+license = "Apache-2.0 OR ISC OR MIT"
+name = "hyper-rustls"
+readme = "README.md"
+repository = "https://github.com/rustls/hyper-rustls"
+rust-version = "1.71"
+version = "0.27.7"
+
+[package.metadata.docs.rs]
+features = ["http1", "http2", "logging", "native-tokio", "ring", "rustls-platform-verifier", "tls12", "webpki-tokio"]
+no-default-features = true
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,0 +1,150 @@
+[dependencies.base64]
+optional = true
+version = "0.22"
+
+[dependencies.bytes]
+version = "1.7.1"
+
+[dependencies.futures-channel]
+optional = true
+version = "0.3"
+
+[dependencies.futures-core]
+version = "0.3"
+
+[dependencies.futures-util]
+default-features = false
+optional = true
+version = "0.3.16"
+
+[dependencies.http]
+version = "1.0"
+
+[dependencies.http-body]
+version = "1.0.0"
+
+[dependencies.hyper]
+version = "1.8.0"
+
+[dependencies.ipnet]
+optional = true
+version = "2.9"
+
+[dependencies.libc]
+optional = true
+version = "0.2"
+
+[dependencies.percent-encoding]
+optional = true
+version = "2.3"
+
+[dependencies.pin-project-lite]
+version = "0.2.4"
+
+[dependencies.socket2]
+features = ["all"]
+optional = true
+version = ">=0.5.9, <0.7"
+
+[dependencies.tokio]
+default-features = false
+optional = true
+version = "1"
+
+[dependencies.tower-layer]
+optional = true
+version = "0.3"
+
+[dependencies.tower-service]
+optional = true
+version = "0.3"
+
+[dependencies.tracing]
+default-features = false
+features = ["std"]
+optional = true
+version = "0.1"
+
+[dev-dependencies.bytes]
+version = "1"
+
+[dev-dependencies.futures-util]
+default-features = false
+features = ["alloc"]
+version = "0.3.16"
+
+[dev-dependencies.http-body-util]
+version = "0.1.0"
+
+[dev-dependencies.hyper]
+features = ["full"]
+version = "1.4.0"
+
+[dev-dependencies.pretty_env_logger]
+version = "0.5"
+
+[dev-dependencies.tokio]
+features = ["macros", "test-util", "signal"]
+version = "1"
+
+[dev-dependencies.tokio-test]
+version = "0.4"
+
+[dev-dependencies.tower-test]
+version = "0.4"
+
+[features]
+__internal_happy_eyeballs_tests = []
+client = ["hyper/client", "tokio/net", "dep:tracing", "dep:futures-channel", "dep:tower-service"]
+client-legacy = ["client", "dep:socket2", "tokio/sync", "dep:libc", "dep:futures-util"]
+client-pool = ["client", "dep:futures-util", "dep:tower-layer"]
+client-proxy = ["client", "dep:base64", "dep:ipnet", "dep:percent-encoding"]
+client-proxy-system = ["dep:system-configuration", "dep:windows-registry"]
+default = []
+full = ["client", "client-legacy", "client-pool", "client-proxy", "client-proxy-system", "server", "server-auto", "server-graceful", "service", "http1", "http2", "tokio", "tracing"]
+http1 = ["hyper/http1"]
+http2 = ["hyper/http2"]
+server = ["hyper/server"]
+server-auto = ["server", "http1", "http2"]
+server-graceful = ["server", "tokio/sync"]
+service = ["dep:tower-service"]
+tokio = ["dep:tokio", "tokio/rt", "tokio/time"]
+tracing = ["dep:tracing"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Sean McArthur <sean@seanmonstar.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["network-programming", "web-programming::http-client", "web-programming::http-server"]
+description = "hyper utilities"
+documentation = "https://docs.rs/hyper-util"
+edition = "2021"
+homepage = "https://hyper.rs"
+keywords = ["http", "hyper", "hyperium"]
+license = "MIT"
+name = "hyper-util"
+readme = "README.md"
+repository = "https://github.com/hyperium/hyper-util"
+rust-version = "1.63"
+version = "0.1.19"
+
+[package.metadata.docs.rs]
+features = ["full"]
+rustdoc-args = ["--cfg", "docsrs"]
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dev-dependencies.pnet_datalink]
+version = "0.35.0"
+
+[target.'cfg(target_os = "macos")'.dependencies.system-configuration]
+optional = true
+version = ">=0.5, <0.7"
+
+[target."cfg(windows)".dependencies.windows-registry]
+optional = true
+version = ">=0.3, <0.7"

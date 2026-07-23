@@ -1,0 +1,53 @@
+#!/usr/bin/make -f
+
+# This Makefile ensures that this versioned cargo (instead of the
+# default) is used for the package build process in three ways:
+#
+# First, it runs all the typical cargo commands when building an Ubuntu/
+# Debian Rust package, including the usage of a local cargo registry.
+#
+# Second, the build of full-versioned-build-deps/version-match will fail
+# if the cargo path being used to build the package does not match the
+# path which is distributed by this package.
+#
+# Third, it checks to make sure the rustc version used to build
+# full-versioned-build-deps/version-match matches the rustc version
+# distributed by this package.
+
+DPKG_EXPORT_BUILDFLAGS := 1
+include /usr/share/dpkg/pkg-info.mk
+include /usr/share/dpkg/buildflags.mk
+DEB_CARGO_CRATE := $(DEB_SOURCE)_$(DEB_VERSION_UPSTREAM)
+export DEB_CARGO_CRATE
+
+
+RAW_RUST_VERSION := $(shell dpkg-parsechangelog -SVersion)
+# Strip everything from the first '+' onwards
+EXPECTED_RUSTC_VERSION := $(shell echo $(RAW_RUST_VERSION) | cut -d+ -f1)
+# Grab the first two dot-separated fields
+RUST_VERSION := $(shell echo $(EXPECTED_RUSTC_VERSION) | cut -d. -f1,2)
+
+include /usr/share/rustc-$(RUST_VERSION)/architecture.mk
+export DEB_HOST_GNU_TYPE DEB_HOST_RUST_TYPE
+
+# Export environment variables for the recipes
+export EXPECTED_RUSTC_VERSION
+export EXPECTED_CARGO_PATH := /usr/lib/rust-$(RUST_VERSION)/bin/cargo
+export PATH := /usr/lib/rust-$(RUST_VERSION)/share/cargo/bin:$(PATH)
+export CARGO_HOME := $(CURDIR)/debian/cargo_home
+# Only necessary because we're using versioned rustc
+export RUSTC := /usr/lib/rust-$(RUST_VERSION)/bin/rustc
+export DESTDIR := $(AUTOPKGTEST_TMP)/version-match/target/$(DEB_HOST_RUST_TYPE)/release
+
+.PHONY: all test-version-match
+
+all: test-version-match
+
+test-version-match:
+	cp -r "debian/tests/full-versioned-build-deps/version-match" "$(AUTOPKGTEST_TMP)" && \
+	cd "$(AUTOPKGTEST_TMP)/version-match" && \
+	cargo prepare-debian "/usr/share/cargo/registry" && \
+	cargo build && \
+	cargo test && \
+	cargo install && \
+	cargo clean

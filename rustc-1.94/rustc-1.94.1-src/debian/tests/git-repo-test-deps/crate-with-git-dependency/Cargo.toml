@@ -1,0 +1,9 @@
+[package]
+name = "crate-with-git-dependency"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+dependent-git-repo = { git = "file:///tmp/dependent-git-repo/.git" }
+
+[workspace]

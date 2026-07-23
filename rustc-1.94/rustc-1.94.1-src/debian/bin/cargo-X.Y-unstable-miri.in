@@ -1,0 +1,9 @@
+#!/bin/sh
+
+echo "warning: invoking version-pinned Miri; this breaks Rust's usual stability guarantees" >&2
+echo "warning: report issues to the package maintainers, not the upstream developers" >&2
+
+export RUSTC_BOOTSTRAP=1
+export CARGO=/usr/bin/cargo-@RUST_VERSION@
+
+exec /usr/lib/rust-@RUST_VERSION@/bin/cargo-miri miri "$@"
