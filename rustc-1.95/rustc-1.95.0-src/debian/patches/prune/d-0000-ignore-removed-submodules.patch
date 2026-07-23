@@ -1,0 +1,266 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Sat, 2 Oct 2021 01:07:59 +0100
+Subject: d-0000-ignore-removed-submodules
+
+Description: remove upstream parts that are not needed for the Debian build, in
+order to both reduce the orig tarball and the vendored crates within.
+
+Forwarded: not-needed
+---
+ Cargo.toml                                 |  7 -----
+ src/bootstrap/bootstrap.py                 |  4 ---
+ src/bootstrap/src/core/build_steps/test.rs | 12 +-------
+ src/bootstrap/src/core/builder.rs          | 47 ++++++------------------------
+ src/tools/rust-analyzer/Cargo.toml         | 11 ++++++-
+ 5 files changed, 20 insertions(+), 61 deletions(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -9,7 +9,6 @@
+   "src/rustc-std-workspace/rustc-std-workspace-std",
+   "src/rustdoc-json-types",
+   "src/tools/build-manifest",
+-  "src/tools/bump-stage0",
+   "src/tools/cargotest",
+   "src/tools/clippy",
+   "src/tools/clippy/clippy_dev",
+@@ -30,8 +29,6 @@
+   "src/tools/miri/cargo-miri",
+   "src/tools/miropt-test-tools",
+   "src/tools/opt-dist",
+-  "src/tools/remote-test-client",
+-  "src/tools/remote-test-server",
+   "src/tools/replace-version-placeholder",
+   "src/tools/run-make-support",
+   "src/tools/rust-installer",
+--- a/src/bootstrap/bootstrap.py
++++ b/src/bootstrap/bootstrap.py
+@@ -1156,10 +1156,6 @@
+         if "BOOTSTRAP_TRACING" in env:
+             args.append("--features=tracing")
+ 
+-        if self.use_locked_deps:
+-            args.append("--locked")
+-        if self.use_vendored_sources:
+-            args.append("--frozen")
+         if self.get_toml("metrics", "build"):
+             args.append("--features")
+             args.append("build-metrics")
+--- a/src/bootstrap/src/core/builder/mod.rs
++++ b/src/bootstrap/src/core/builder/mod.rs
+@@ -768,8 +768,6 @@
+                 compile::Std,
+                 compile::Rustc,
+                 compile::Assemble,
+-                compile::CraneliftCodegenBackend,
+-                compile::GccCodegenBackend,
+                 compile::StartupObjects,
+                 tool::BuildManifest,
+                 tool::Rustbook,
+@@ -779,31 +777,20 @@
+                 tool::Linkchecker,
+                 tool::CargoTest,
+                 tool::Compiletest,
+-                tool::RemoteTestServer,
+-                tool::RemoteTestClient,
+                 tool::RustInstaller,
+                 tool::FeaturesStatusDump,
+                 tool::Cargo,
+-                tool::RustAnalyzer,
+                 tool::RustAnalyzerProcMacroSrv,
+                 tool::Rustdoc,
+                 tool::Clippy,
+                 tool::CargoClippy,
+-                llvm::Llvm,
+-                gcc::Gcc,
+-                llvm::Sanitizers,
+                 tool::Rustfmt,
+                 tool::Cargofmt,
+                 tool::Miri,
+                 tool::CargoMiri,
+-                llvm::Lld,
+-                llvm::Enzyme,
+-                llvm::CrtBeginEnd,
+-                tool::RustdocGUITest,
+                 tool::OptimizedDist,
+                 tool::CoverageDump,
+                 tool::LlvmBitcodeLinker,
+-                tool::RustcPerf,
+                 tool::WasmComponentLd,
+                 tool::LldWrapper
+             ),
+@@ -815,7 +802,6 @@
+                 clippy::BuildManifest,
+                 clippy::CargoMiri,
+                 clippy::Clippy,
+-                clippy::CodegenGcc,
+                 clippy::CollectLicenseMetadata,
+                 clippy::Compiletest,
+                 clippy::CoverageDump,
+@@ -824,11 +810,7 @@
+                 clippy::LintDocs,
+                 clippy::LlvmBitcodeLinker,
+                 clippy::Miri,
+-                clippy::MiroptTestTools,
+                 clippy::OptDist,
+-                clippy::RemoteTestClient,
+-                clippy::RemoteTestServer,
+-                clippy::RustAnalyzer,
+                 clippy::Rustdoc,
+                 clippy::Rustfmt,
+                 clippy::RustInstaller,
+@@ -839,23 +821,17 @@
+             Kind::Check | Kind::Fix => describe!(
+                 check::Rustc,
+                 check::Rustdoc,
+-                check::CraneliftCodegenBackend,
+-                check::GccCodegenBackend,
+                 check::Clippy,
+                 check::Miri,
+                 check::CargoMiri,
+-                check::MiroptTestTools,
+                 check::Rustfmt,
+-                check::RustAnalyzer,
+                 check::TestFloatParse,
+                 check::Bootstrap,
+                 check::RunMakeSupport,
+                 check::Compiletest,
+-                check::RustdocGuiTest,
+                 check::FeaturesStatusDump,
+                 check::CoverageDump,
+                 check::Linkchecker,
+-                check::BumpStage0,
+                 check::Tidy,
+                 // This has special staging logic, it may run on stage 1 while others run on stage 0.
+                 // It takes quite some time to build stage 1, so put this at the end.
+@@ -883,19 +859,15 @@
+                 test::RustdocHtml,
+                 test::CoverageRunRustdoc,
+                 test::Pretty,
+-                test::CodegenCranelift,
+-                test::CodegenGCC,
+                 test::Crate,
+                 test::CrateLibrustc,
+                 test::CrateRustdoc,
+                 test::CrateRustdocJsonTypes,
+                 test::CrateBootstrap,
+-                test::RemoteTestClientTests,
+                 test::Linkcheck,
+                 test::TierCheck,
+                 test::Cargotest,
+                 test::Cargo,
+-                test::RustAnalyzer,
+                 test::ErrorIndex,
+                 test::Distcheck,
+                 test::Nomicon,
+@@ -966,14 +938,11 @@
+                 dist::JsonDocs,
+                 dist::Mingw,
+                 dist::Rustc,
+-                dist::CraneliftCodegenBackend,
+-                dist::GccCodegenBackend,
+                 dist::Std,
+                 dist::RustcDev,
+                 dist::Analysis,
+                 dist::Src,
+                 dist::Cargo,
+-                dist::RustAnalyzer,
+                 dist::Rustfmt,
+                 dist::Clippy,
+                 dist::Miri,
+@@ -990,8 +959,6 @@
+                 dist::PlainSourceTarballGpl,
+                 dist::BuildManifest,
+                 dist::ReproducibleArtifacts,
+-                dist::GccDev,
+-                dist::Gcc
+             ),
+             Kind::Install => describe!(
+                 install::Docs,
+@@ -1003,13 +970,11 @@
+                 install::Rustc,
+                 install::RustcDev,
+                 install::Cargo,
+-                install::RustAnalyzer,
+                 install::Rustfmt,
+                 install::Clippy,
+                 install::Miri,
+                 install::LlvmTools,
+                 install::Src,
+-                install::RustcCodegenCranelift,
+                 install::LlvmBitcodeLinker
+             ),
+             Kind::Run => describe!(
+--- a/src/tools/rust-analyzer/Cargo.toml
++++ b/src/tools/rust-analyzer/Cargo.toml
+@@ -1,5 +1,15 @@
+ [workspace]
+-members = ["xtask/", "lib/*", "lib/ungrammar/ungrammar2json", "crates/*"]
++members = [
++  "xtask/",
++  "lib/*",
++  "lib/ungrammar/ungrammar2json",
++  "crates/proc-macro-srv",
++  "crates/proc-macro-srv-cli",
++  "crates/tt",
++  "crates/mbe",
++  "crates/paths",
++  "crates/proc-macro-api",
++]
+ exclude = ["crates/proc-macro-srv/proc-macro-test/imp"]
+ resolver = "2"
+ 
+--- a/src/build_helper/src/util.rs
++++ b/src/build_helper/src/util.rs
+@@ -61,19 +61,5 @@
+ 
+ /// Returns the submodule paths from the `.gitmodules` file in the given directory.
+ pub fn parse_gitmodules(target_dir: &Path) -> Vec<String> {
+-    let gitmodules = target_dir.join(".gitmodules");
+-    assert!(gitmodules.exists(), "'{}' file is missing.", gitmodules.display());
+-
+-    let file = File::open(gitmodules).unwrap();
+-
+-    let mut submodules_paths = vec![];
+-    for line in BufReader::new(file).lines().map_while(Result::ok) {
+-        let line = line.trim();
+-        if line.starts_with("path") {
+-            let actual_path = line.split(' ').next_back().expect("Couldn't get value of path");
+-            submodules_paths.push(actual_path.to_owned());
+-        }
+-    }
+-
+-    submodules_paths
++    Vec::new()
+ }
+--- a/src/bootstrap/src/core/builder/cargo.rs
++++ b/src/bootstrap/src/core/builder/cargo.rs
+@@ -1351,10 +1351,7 @@
+             }
+         }
+ 
+-        if self.config.locked_deps {
+-            cargo.arg("--locked");
+-        }
+-        if self.config.vendor || self.is_sudo {
++        if self.is_sudo {
+             cargo.arg("--frozen");
+         }
+ 
+--- a/src/bootstrap/src/core/build_steps/vendor.rs
++++ b/src/bootstrap/src/core/build_steps/vendor.rs
+@@ -21,14 +21,9 @@
+         ("src/tools/cargo/Cargo.toml", vec!["src/tools/cargo"]),
+         ("src/tools/clippy/clippy_test_deps/Cargo.toml", vec![]),
+         ("src/tools/rust-analyzer/Cargo.toml", vec![]),
+-        ("compiler/rustc_codegen_cranelift/Cargo.toml", vec![]),
+-        ("compiler/rustc_codegen_gcc/Cargo.toml", vec![]),
+         ("library/Cargo.toml", vec![]),
+         ("src/bootstrap/Cargo.toml", vec![]),
+         ("src/tools/rustbook/Cargo.toml", SUBMODULES_FOR_RUSTBOOK.into()),
+-        ("src/tools/rustc-perf/Cargo.toml", vec!["src/tools/rustc-perf"]),
+-        ("src/tools/opt-dist/Cargo.toml", vec![]),
+-        ("src/doc/book/packages/trpl/Cargo.toml", vec![]),
+     ]
+     .into_iter()
+     .map(|(path, submodules)| (builder.src.join(path), submodules))

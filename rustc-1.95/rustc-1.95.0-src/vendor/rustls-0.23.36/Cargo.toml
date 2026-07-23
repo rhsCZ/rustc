@@ -1,0 +1,153 @@
+[build-dependencies.rustversion]
+optional = true
+version = "1.0.6"
+
+[dependencies.aws-lc-rs]
+default-features = false
+optional = true
+version = "1.14"
+
+[dependencies.brotli]
+default-features = false
+features = ["std"]
+optional = true
+version = "8"
+
+[dependencies.brotli-decompressor]
+optional = true
+version = "5.0.0"
+
+[dependencies.hashbrown]
+default-features = false
+features = ["default-hasher", "inline-more"]
+optional = true
+version = "0.15"
+
+[dependencies.log]
+optional = true
+version = "0.4.8"
+
+[dependencies.once_cell]
+default-features = false
+features = ["alloc", "race"]
+version = "1.16"
+
+[dependencies.pki-types]
+features = ["alloc"]
+package = "rustls-pki-types"
+version = "1.12"
+
+[dependencies.ring]
+optional = true
+version = "0.17"
+
+[dependencies.subtle]
+default-features = false
+version = "2.5.0"
+
+[dependencies.webpki]
+default-features = false
+features = ["alloc"]
+package = "rustls-webpki"
+version = "0.103.5"
+
+[dependencies.zeroize]
+version = "1.8"
+
+[dependencies.zlib-rs]
+optional = true
+version = "0.5"
+
+[dev-dependencies.base64]
+version = "0.22"
+
+[dev-dependencies.bencher]
+version = "0.1.5"
+
+[dev-dependencies.env_logger]
+version = "0.11"
+
+[dev-dependencies.hex]
+version = "0.4"
+
+[dev-dependencies.log]
+version = "0.4.8"
+
+[dev-dependencies.macro_rules_attribute]
+version = "0.2"
+
+[dev-dependencies.num-bigint]
+version = "0.4.4"
+
+[dev-dependencies.rcgen]
+default-features = false
+features = ["pem", "aws_lc_rs"]
+version = "0.14"
+
+[dev-dependencies.serde]
+features = ["derive"]
+version = "1"
+
+[dev-dependencies.serde_json]
+version = "1"
+
+[dev-dependencies.time]
+default-features = false
+version = "0.3.6"
+
+[dev-dependencies.webpki-roots]
+version = "1"
+
+[dev-dependencies.x509-parser]
+version = "0.17"
+
+[features]
+aws-lc-rs = ["aws_lc_rs"]
+aws_lc_rs = ["dep:aws-lc-rs", "webpki/aws-lc-rs", "aws-lc-rs/aws-lc-sys", "aws-lc-rs/prebuilt-nasm"]
+brotli = ["dep:brotli", "dep:brotli-decompressor", "std"]
+custom-provider = []
+default = ["aws_lc_rs", "logging", "prefer-post-quantum", "std", "tls12"]
+fips = ["aws_lc_rs", "aws-lc-rs?/fips", "webpki/aws-lc-rs-fips"]
+logging = ["log"]
+prefer-post-quantum = ["aws_lc_rs"]
+read_buf = ["rustversion", "std"]
+ring = ["dep:ring", "webpki/ring"]
+std = ["webpki/std", "pki-types/std", "once_cell/std"]
+tls12 = []
+zlib = ["dep:zlib-rs"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(bench)", "cfg(coverage_nightly)", "cfg(read_buf)", "cfg(rustls_docsrs)"]
+level = "warn"
+priority = 0
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["network-programming", "cryptography"]
+description = "Rustls is a modern TLS library written in Rust."
+edition = "2021"
+exclude = ["src/testdata", "tests/**"]
+homepage = "https://github.com/rustls/rustls"
+license = "Apache-2.0 OR ISC OR MIT"
+name = "rustls"
+readme = "README.md"
+repository = "https://github.com/rustls/rustls"
+rust-version = "1.71"
+version = "0.23.36"
+
+[package.metadata.cargo-semver-checks.lints]
+enum_no_repr_variant_discriminant_changed = "warn"
+
+[package.metadata.cargo_check_external_types]
+allowed_external_types = ["rustls_pki_types", "rustls_pki_types::*"]
+
+[package.metadata.docs.rs]
+features = ["read_buf", "ring"]
+rustdoc-args = ["--cfg", "rustls_docsrs"]

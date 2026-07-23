@@ -1,0 +1,82 @@
+[dependencies.arbitrary]
+optional = true
+version = "1.0"
+
+[dependencies.bytemuck]
+optional = true
+version = "1.12"
+
+[dependencies.compiler_builtins]
+optional = true
+version = "0.1.2"
+
+[dependencies.core]
+optional = true
+package = "rustc-std-workspace-core"
+version = "1.0.0"
+
+[dependencies.serde]
+default-features = false
+optional = true
+version = "1.0.103"
+
+[dev-dependencies.arbitrary]
+features = ["derive"]
+version = "1.0"
+
+[dev-dependencies.bytemuck]
+features = ["derive"]
+version = "1.12.2"
+
+[dev-dependencies.rustversion]
+version = "1.0"
+
+[dev-dependencies.serde_derive]
+version = "1.0.103"
+
+[dev-dependencies.serde_json]
+version = "1.0"
+
+[dev-dependencies.serde_test]
+version = "1.0.19"
+
+[dev-dependencies.trybuild]
+version = "1.0.18"
+
+[dev-dependencies.zerocopy]
+features = ["derive"]
+version = "0.8"
+
+[features]
+example_generated = []
+rustc-dep-of-std = ["core", "compiler_builtins"]
+std = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["The Rust Project Developers"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["no-std"]
+description = """
+A macro to generate structures which behave like bitflags.
+"""
+documentation = "https://docs.rs/bitflags"
+edition = "2021"
+exclude = ["/tests", "/.github"]
+homepage = "https://github.com/bitflags/bitflags"
+keywords = ["bit", "bitmask", "bitflags", "flags"]
+license = "MIT OR Apache-2.0"
+name = "bitflags"
+readme = "README.md"
+repository = "https://github.com/bitflags/bitflags"
+rust-version = "1.56.0"
+version = "2.9.1"
+
+[package.metadata.docs.rs]
+features = ["example_generated"]

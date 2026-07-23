@@ -1,0 +1,45 @@
+[badges.maintenance]
+status = "actively-developed"
+
+[dependencies.memchr]
+default-features = false
+optional = true
+version = "2.4.1"
+
+[dependencies.serde]
+default-features = false
+features = ["derive"]
+optional = true
+version = "1.0.103"
+
+[dev-dependencies.serde_test]
+version = "1.0.104"
+
+[features]
+alloc = ["serde?/alloc"]
+default = ["std"]
+std = ["alloc", "memchr?/std", "serde?/std"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["YOSHIOKA Takuma <nop_thread@nops.red>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+description = "IRI as string types"
+edition = "2021"
+keywords = ["IRI", "URI"]
+license = "MIT OR Apache-2.0"
+name = "iri-string"
+readme = "README.md"
+repository = "https://github.com/lo48576/iri-string"
+rust-version = "1.60"
+version = "0.7.10"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

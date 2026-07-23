@@ -1,0 +1,19 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Thu, 13 Jun 2024 11:16:39 +0200
+Subject: d-ignore-test_arc_condvar_poison-ppc
+
+Forwarded: no
+---
+ library/std/src/sync/mutex/tests.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/library/std/tests/sync/condvar.rs
++++ b/library/std/tests/sync/condvar.rs
+@@ -563,6 +563,7 @@
+     })
+ }
+ 
++#[cfg(not(target_arch = "powerpc"))]
+ #[test]
+ #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
+ fn test_arc_condvar_poison() {

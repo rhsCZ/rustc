@@ -1,0 +1,41 @@
+From: Matthijs van Otterdijk <matthijs@wirevirt.net>
+Date: Thu, 14 Jul 2022 13:17:38 +0200
+Subject: Don't check for cargo-vendor when building from (Debian's) git
+
+Forwarded: not-needed
+---
+ src/bootstrap/src/core/build_steps/dist.rs | 6 ++++--
+ src/bootstrap/src/utils/channel.rs         | 6 ++++++
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+--- a/src/bootstrap/src/core/build_steps/dist.rs
++++ b/src/bootstrap/src/core/build_steps/dist.rs
+@@ -1352,7 +1352,10 @@
+     write_git_info(builder.rust_info().info(), plain_dst_src);
+     write_git_info(builder.cargo_info.info(), &plain_dst_src.join("./src/tools/cargo"));
+ 
+-    if builder.config.dist_vendor {
++    //
++    // Debian: short-circuited because the Debian package is also in a git
++    //         repository, but cargo-vendor should not be installed or run.
++    if false {
+         builder.require_and_update_all_submodules();
+ 
+         // Vendor packages that are required by opt-dist to collect PGO profiles.
+--- a/src/bootstrap/src/utils/channel.rs
++++ b/src/bootstrap/src/utils/channel.rs
+@@ -36,8 +36,13 @@
+ 
+ impl GitInfo {
+     pub fn new(omit_git_hash: bool, dir: &Path, exec_ctx: impl AsRef<ExecutionContext>) -> GitInfo {
++        //
++        // Debian: returning early because the Debian package is also in a git
++        //         repository, but we don't want to parse gitinfo. This is
++        //         needed for the bootstrap tests to work which running for
++        //         Debian git.
+         // See if this even begins to look like a git dir
+-        if !dir.join(".git").exists() {
++        if true {
+             match read_commit_info_file(dir) {
+                 Some(info) => return GitInfo::RecordedForTarball(info),
+                 None => return GitInfo::Absent,

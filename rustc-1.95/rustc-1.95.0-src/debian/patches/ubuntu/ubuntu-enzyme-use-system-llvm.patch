@@ -1,0 +1,17 @@
+Description: Make LLVM Enzyme project use system LLVM
+Author: Zixing Liu <zixing.liu@canonical.com>
+Forwarded: not-needed
+Last-Update: 2024-12-05
+---
+--- a/src/bootstrap/src/core/build_steps/llvm.rs
++++ b/src/bootstrap/src/core/build_steps/llvm.rs
+@@ -1174,7 +1174,8 @@
+             .define("LLVM_ENABLE_ASSERTIONS", "ON")
+             .define("ENZYME_EXTERNAL_SHARED_LIB", "ON")
+             .define("ENZYME_BC_LOADER", "OFF")
+-            .define("LLVM_DIR", llvm_cmake_dir);
++            .define("LLVM_DIR", "/usr/lib/llvm-22")
++            .define("CMAKE_SKIP_RPATH", "ON");
+ 
+         cfg.build();
+ 

@@ -1,0 +1,25 @@
+[features]
+default = ["unicode"]
+unicode = ["unicode-age", "unicode-bool", "unicode-case", "unicode-gencat", "unicode-perl", "unicode-script", "unicode-segment"]
+unicode-age = []
+unicode-bool = []
+unicode-case = []
+unicode-gencat = []
+unicode-perl = []
+unicode-script = []
+unicode-segment = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["The Rust Project Developers"]
+description = "A regular expression parser."
+documentation = "https://docs.rs/regex-syntax"
+edition = "2018"
+homepage = "https://github.com/rust-lang/regex"
+license = "MIT OR Apache-2.0"
+name = "regex-syntax"
+readme = "README.md"
+repository = "https://github.com/rust-lang/regex"
+version = "0.6.29"

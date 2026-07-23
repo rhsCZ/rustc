@@ -1,0 +1,3 @@
+usr/lib/rust-${env:RUST_VERSION}/bin/miri
+usr/lib/rust-${env:RUST_VERSION}/bin/cargo-miri
+debian/bin/cargo-${env:RUST_VERSION}-unstable-miri usr/bin

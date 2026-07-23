@@ -1,0 +1,177 @@
+[dependencies.atomic-waker]
+optional = true
+version = "1.1.2"
+
+[dependencies.bytes]
+version = "1.2"
+
+[dependencies.futures-channel]
+optional = true
+version = "0.3"
+
+[dependencies.futures-core]
+optional = true
+version = "0.3.31"
+
+[dependencies.futures-util]
+default-features = false
+features = ["alloc"]
+optional = true
+version = "0.3"
+
+[dependencies.h2]
+optional = true
+version = "0.4.2"
+
+[dependencies.http]
+version = "1"
+
+[dependencies.http-body]
+version = "1"
+
+[dependencies.http-body-util]
+optional = true
+version = "0.1"
+
+[dependencies.httparse]
+optional = true
+version = "1.9"
+
+[dependencies.httpdate]
+optional = true
+version = "1.0"
+
+[dependencies.itoa]
+optional = true
+version = "1"
+
+[dependencies.pin-project-lite]
+optional = true
+version = "0.2.4"
+
+[dependencies.pin-utils]
+optional = true
+version = "0.1"
+
+[dependencies.smallvec]
+features = ["const_generics", "const_new"]
+optional = true
+version = "1.12"
+
+[dependencies.tokio]
+features = ["sync"]
+version = "1"
+
+[dependencies.tracing]
+default-features = false
+features = ["std"]
+optional = true
+version = "0.1"
+
+[dependencies.want]
+optional = true
+version = "0.3"
+
+[dev-dependencies.form_urlencoded]
+version = "1"
+
+[dev-dependencies.futures-channel]
+features = ["sink"]
+version = "0.3"
+
+[dev-dependencies.futures-util]
+default-features = false
+features = ["alloc", "sink"]
+version = "0.3"
+
+[dev-dependencies.http-body-util]
+version = "0.1"
+
+[dev-dependencies.pin-project-lite]
+version = "0.2.4"
+
+[dev-dependencies.pretty_env_logger]
+version = "0.5"
+
+[dev-dependencies.serde]
+features = ["derive"]
+version = "1.0"
+
+[dev-dependencies.serde_json]
+version = "1.0"
+
+[dev-dependencies.spmc]
+version = "0.3"
+
+[dev-dependencies.tokio]
+features = ["fs", "macros", "net", "io-std", "io-util", "rt", "rt-multi-thread", "sync", "time", "test-util"]
+version = "1"
+
+[dev-dependencies.tokio-test]
+version = "0.4"
+
+[dev-dependencies.tokio-util]
+version = "0.7.10"
+
+[features]
+capi = []
+client = ["dep:want", "dep:pin-project-lite", "dep:smallvec"]
+default = []
+ffi = ["dep:http-body-util", "dep:futures-util"]
+full = ["client", "http1", "http2", "server"]
+http1 = ["dep:atomic-waker", "dep:futures-channel", "dep:futures-core", "dep:httparse", "dep:itoa", "dep:pin-utils"]
+http2 = ["dep:futures-channel", "dep:futures-core", "dep:h2"]
+nightly = []
+server = ["dep:httpdate", "dep:pin-project-lite", "dep:smallvec"]
+tracing = ["dep:tracing"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(hyper_unstable_tracing)", "cfg(hyper_unstable_ffi)"]
+level = "warn"
+priority = 0
+
+[package]
+authors = ["Sean McArthur <sean@seanmonstar.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["network-programming", "web-programming::http-client", "web-programming::http-server"]
+description = "A protective and efficient HTTP library for all."
+documentation = "https://docs.rs/hyper"
+edition = "2021"
+homepage = "https://hyper.rs"
+include = ["Cargo.toml", "LICENSE", "src/**/*"]
+keywords = ["http", "hyper", "hyperium"]
+license = "MIT"
+name = "hyper"
+readme = "README.md"
+repository = "https://github.com/hyperium/hyper"
+rust-version = "1.63"
+version = "1.8.1"
+
+[package.metadata.capi.header]
+generation = false
+subdirectory = false
+
+[[package.metadata.capi.install.include.asset]]
+from = "capi/include/hyper.h"
+
+[package.metadata.docs.rs]
+features = ["ffi", "full", "tracing"]
+rustdoc-args = ["--cfg", "hyper_unstable_ffi", "--cfg", "hyper_unstable_tracing"]
+
+[package.metadata.playground]
+features = ["full"]
+
+[profile.bench]
+codegen-units = 1
+incremental = false
+
+[profile.release]
+codegen-units = 1
+incremental = false

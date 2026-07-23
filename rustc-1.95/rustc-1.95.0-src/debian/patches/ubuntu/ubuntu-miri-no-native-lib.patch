@@ -1,0 +1,33 @@
+Description: Disable Miri native-lib feature
+ The native-lib feature in Miri is a work-in-progress and it pulls in a
+ bunch of bundled C dependencies.
+ .
+ As of right now, it simply isn't worth it to include this feature,
+ especially considering the rust-miri package is intended for automated
+ Rust package checks.
+Author: Max Gilmour <max.gilmour@canonical.com>
+Forwarded: not-needed
+Last-Update: 2026-02-12
+---
+Index: rustc-1.95.0-src/src/tools/miri/Cargo.toml
+===================================================================
+--- rustc-1.95.0-src.orig/src/tools/miri/Cargo.toml
++++ rustc-1.95.0-src/src/tools/miri/Cargo.toml
+@@ -61,14 +61,14 @@ name = "ui"
+ harness = false
+ 
+ [features]
+-default = ["stack-cache", "native-lib"]
++default = ["stack-cache"]
+ genmc = ["dep:genmc-sys"]
+ stack-cache = []
+ expensive-consistency-checks = ["stack-cache"]
+ tracing = ["serde_json"]
+-native-lib = ["dep:libffi", "dep:libloading", "dep:capstone", "dep:ipc-channel", "dep:nix", "dep:serde"]
++native-lib = []
+ jemalloc = []
+-check_only = ["libffi?/check_only", "capstone?/check_only", "genmc-sys?/check_only"]
++check_only = ["genmc-sys?/check_only"]
+ 
+ [lints.rust.unexpected_cfgs]
+ level = "warn"

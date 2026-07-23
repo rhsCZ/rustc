@@ -1,0 +1,21 @@
+Description: Allow miri to be built on the stable channel
+Author: Max Gilmour <max.gilmour@canonical.com>
+Forwarded: not-needed
+Last-Update: 2026-01-20
+---
+--- a/src/bootstrap/src/core/build_steps/dist.rs
++++ b/src/bootstrap/src/core/build_steps/dist.rs
+@@ -1579,9 +1579,10 @@
+         // This prevents miri from being built for "dist" or "install"
+         // on the stable/beta channels. It is a nightly-only tool and should
+         // not be included.
+-        if !builder.build.unstable_features() {
+-            return None;
+-        }
++        // UBUNTU: Allow building miri on stable channel
++        // if !builder.build.unstable_features() {
++        //     return None;
++        // }
+ 
+         let miri = builder.ensure(tool::Miri::from_compilers(self.compilers));
+         let cargomiri = builder.ensure(tool::CargoMiri::from_compilers(self.compilers));

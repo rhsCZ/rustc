@@ -1,0 +1,25 @@
+[dependencies]
+
+[dev-dependencies]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Tower Maintainers <team@tower-rs.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autotests = false
+categories = ["asynchronous", "network-programming"]
+description = """
+Decorates a `Service` to allow easy composition between `Service`s.
+"""
+documentation = "https://docs.rs/tower-layer/0.3.3"
+edition = "2018"
+homepage = "https://github.com/tower-rs/tower"
+license = "MIT"
+name = "tower-layer"
+readme = "README.md"
+repository = "https://github.com/tower-rs/tower"
+version = "0.3.3"

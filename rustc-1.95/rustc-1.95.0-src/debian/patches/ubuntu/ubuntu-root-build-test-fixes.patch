@@ -1,0 +1,1625 @@
+Description: Stabilize 1.95 test suite under LLVM 22 and root buildds
+ Launchpad buildds execute parts of the test suite as root, which breaks a
+ couple of permission and RLIMIT_NPROC tests. LLVM 22 related packaging
+ directives also shifted some UI reference line numbers. Keep the tests
+ deterministic for the package build.
+Author: Codex <codex@example.org>
+Forwarded: not-needed
+Last-Update: 2026-07-10
+
+--- a/tests/run-make/inaccessible-temp-dir/rmake.rs	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/run-make/inaccessible-temp-dir/rmake.rs	2026-07-10 14:47:12.071354896 +0200
+@@ -24,9 +24,13 @@
+ // Reason: `set_readonly` has no effect on directories
+ // and does not prevent modification.
+ 
+-use run_make_support::{rfs, rustc, test_while_readonly};
++use run_make_support::{libc, rfs, rustc, test_while_readonly};
+ 
+ fn main() {
++    if unsafe { libc::geteuid() } == 0 {
++        return;
++    }
++
+     // Create an inaccessible directory.
+     rfs::create_dir("inaccessible");
+     test_while_readonly("inaccessible", || {
+--- a/tests/run-make/libtest-thread-limit/rmake.rs	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/run-make/libtest-thread-limit/rmake.rs	2026-07-10 14:47:12.071354896 +0200
+@@ -18,6 +18,10 @@
+ use run_make_support::{libc, rustc};
+ 
+ fn main() {
++    if unsafe { libc::geteuid() } == 0 {
++        return;
++    }
++
+     rustc().input("test.rs").arg("--test").run();
+ 
+     // We need to emulate an environment for libtest where threads are exhausted and spawning
+--- a/tests/run-make/rustdoc-io-error/rmake.rs	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/run-make/rustdoc-io-error/rmake.rs	2026-07-10 14:47:12.071354896 +0200
+@@ -15,9 +15,13 @@
+ //@ ignore-windows - the `set_readonly` functions doesn't work on folders.
+ //@ needs-target-std
+ 
+-use run_make_support::{path, rfs, rustdoc};
++use run_make_support::{libc, path, rfs, rustdoc};
+ 
+ fn main() {
++    if unsafe { libc::geteuid() } == 0 {
++        return;
++    }
++
+     let out_dir = path("rustdoc-io-error");
+     rfs::create_dir(&out_dir);
+     let mut permissions = rfs::metadata(&out_dir).permissions();
+--- a/tests/rustdoc-ui/issues/issue-98690.rs	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/rustdoc-ui/issues/issue-98690.rs	2026-07-10 14:47:12.071354896 +0200
+@@ -1,4 +1,4 @@
+-//@ compile-flags: --test --persist-doctests /../../ -Z unstable-options
++//@ compile-flags: --test --persist-doctests /proc/self/fd/0/issue-98690 -Z unstable-options
+ //@ failure-status: 101
+ //@ only-linux
+ 
+--- a/tests/rustdoc-ui/issues/issue-98690.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/rustdoc-ui/issues/issue-98690.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1 +1 @@
+-Couldn't create directory for doctest executables: Permission denied (os error 13)
++Couldn't create directory for doctest executables: Not a directory (os error 20)
+--- a/tests/ui/abi/cannot-be-called.amdgpu.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.amdgpu.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:51:8
++  --> $DIR/cannot-be-called.rs:52:8
+    |
+ LL | extern "x86-interrupt" fn x86(_x: *const u8) {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:100:22
++  --> $DIR/cannot-be-called.rs:101:22
+    |
+ LL | fn x86_ptr(f: extern "x86-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error: functions with the "gpu-kernel" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:70:5
++  --> $DIR/cannot-be-called.rs:71:5
+    |
+ LL |     gpu_kernel();
+    |     ^^^^^^^^^^^^
+    |
+ note: an `extern "gpu-kernel"` function must be launched on the GPU by the runtime
+-  --> $DIR/cannot-be-called.rs:70:5
++  --> $DIR/cannot-be-called.rs:71:5
+    |
+ LL |     gpu_kernel();
+    |     ^^^^^^^^^^^^
+ 
+ error: functions with the "gpu-kernel" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:108:5
++  --> $DIR/cannot-be-called.rs:109:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "gpu-kernel"` function must be launched on the GPU by the runtime
+-  --> $DIR/cannot-be-called.rs:108:5
++  --> $DIR/cannot-be-called.rs:109:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.avr.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.avr.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:51:8
++  --> $DIR/cannot-be-called.rs:52:8
+    |
+ LL | extern "x86-interrupt" fn x86(_x: *const u8) {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:100:22
++  --> $DIR/cannot-be-called.rs:101:22
+    |
+ LL | fn x86_ptr(f: extern "x86-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "avr-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:60:5
++  --> $DIR/cannot-be-called.rs:61:5
+    |
+ LL |     avr();
+    |     ^^^^^
+    |
+ note: an `extern "avr-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:60:5
++  --> $DIR/cannot-be-called.rs:61:5
+    |
+ LL |     avr();
+    |     ^^^^^
+ 
+ error: functions with the "avr-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:78:5
++  --> $DIR/cannot-be-called.rs:79:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "avr-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:78:5
++  --> $DIR/cannot-be-called.rs:79:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.i686.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.i686.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "x86-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:68:5
++  --> $DIR/cannot-be-called.rs:69:5
+    |
+ LL |     x86(&raw const BYTE);
+    |     ^^^^^^^^^^^^^^^^^^^^
+    |
+ note: an `extern "x86-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:68:5
++  --> $DIR/cannot-be-called.rs:69:5
+    |
+ LL |     x86(&raw const BYTE);
+    |     ^^^^^^^^^^^^^^^^^^^^
+ 
+ error: functions with the "x86-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:102:5
++  --> $DIR/cannot-be-called.rs:103:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "x86-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:102:5
++  --> $DIR/cannot-be-called.rs:103:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.msp430.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.msp430.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:51:8
++  --> $DIR/cannot-be-called.rs:52:8
+    |
+ LL | extern "x86-interrupt" fn x86(_x: *const u8) {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:100:22
++  --> $DIR/cannot-be-called.rs:101:22
+    |
+ LL | fn x86_ptr(f: extern "x86-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "msp430-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:62:5
++  --> $DIR/cannot-be-called.rs:63:5
+    |
+ LL |     msp430();
+    |     ^^^^^^^^
+    |
+ note: an `extern "msp430-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:62:5
++  --> $DIR/cannot-be-called.rs:63:5
+    |
+ LL |     msp430();
+    |     ^^^^^^^^
+ 
+ error: functions with the "msp430-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:84:5
++  --> $DIR/cannot-be-called.rs:85:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "msp430-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:84:5
++  --> $DIR/cannot-be-called.rs:85:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.nvptx.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.nvptx.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:51:8
++  --> $DIR/cannot-be-called.rs:52:8
+    |
+ LL | extern "x86-interrupt" fn x86(_x: *const u8) {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:100:22
++  --> $DIR/cannot-be-called.rs:101:22
+    |
+ LL | fn x86_ptr(f: extern "x86-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error: functions with the "gpu-kernel" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:70:5
++  --> $DIR/cannot-be-called.rs:71:5
+    |
+ LL |     gpu_kernel();
+    |     ^^^^^^^^^^^^
+    |
+ note: an `extern "gpu-kernel"` function must be launched on the GPU by the runtime
+-  --> $DIR/cannot-be-called.rs:70:5
++  --> $DIR/cannot-be-called.rs:71:5
+    |
+ LL |     gpu_kernel();
+    |     ^^^^^^^^^^^^
+ 
+ error: functions with the "gpu-kernel" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:108:5
++  --> $DIR/cannot-be-called.rs:109:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "gpu-kernel"` function must be launched on the GPU by the runtime
+-  --> $DIR/cannot-be-called.rs:108:5
++  --> $DIR/cannot-be-called.rs:109:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.riscv32.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.riscv32.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,95 +1,95 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:51:8
++  --> $DIR/cannot-be-called.rs:52:8
+    |
+ LL | extern "x86-interrupt" fn x86(_x: *const u8) {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:100:22
++  --> $DIR/cannot-be-called.rs:101:22
+    |
+ LL | fn x86_ptr(f: extern "x86-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "riscv-interrupt-m" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:64:5
++  --> $DIR/cannot-be-called.rs:65:5
+    |
+ LL |     riscv_m();
+    |     ^^^^^^^^^
+    |
+ note: an `extern "riscv-interrupt-m"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:64:5
++  --> $DIR/cannot-be-called.rs:65:5
+    |
+ LL |     riscv_m();
+    |     ^^^^^^^^^
+ 
+ error: functions with the "riscv-interrupt-s" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:66:5
++  --> $DIR/cannot-be-called.rs:67:5
+    |
+ LL |     riscv_s();
+    |     ^^^^^^^^^
+    |
+ note: an `extern "riscv-interrupt-s"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:66:5
++  --> $DIR/cannot-be-called.rs:67:5
+    |
+ LL |     riscv_s();
+    |     ^^^^^^^^^
+ 
+ error: functions with the "riscv-interrupt-m" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:90:5
++  --> $DIR/cannot-be-called.rs:91:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "riscv-interrupt-m"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:90:5
++  --> $DIR/cannot-be-called.rs:91:5
+    |
+ LL |     f()
+    |     ^^^
+ 
+ error: functions with the "riscv-interrupt-s" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:96:5
++  --> $DIR/cannot-be-called.rs:97:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "riscv-interrupt-s"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:96:5
++  --> $DIR/cannot-be-called.rs:97:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.riscv64.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.riscv64.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,95 +1,95 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:51:8
++  --> $DIR/cannot-be-called.rs:52:8
+    |
+ LL | extern "x86-interrupt" fn x86(_x: *const u8) {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "x86-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:100:22
++  --> $DIR/cannot-be-called.rs:101:22
+    |
+ LL | fn x86_ptr(f: extern "x86-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "riscv-interrupt-m" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:64:5
++  --> $DIR/cannot-be-called.rs:65:5
+    |
+ LL |     riscv_m();
+    |     ^^^^^^^^^
+    |
+ note: an `extern "riscv-interrupt-m"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:64:5
++  --> $DIR/cannot-be-called.rs:65:5
+    |
+ LL |     riscv_m();
+    |     ^^^^^^^^^
+ 
+ error: functions with the "riscv-interrupt-s" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:66:5
++  --> $DIR/cannot-be-called.rs:67:5
+    |
+ LL |     riscv_s();
+    |     ^^^^^^^^^
+    |
+ note: an `extern "riscv-interrupt-s"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:66:5
++  --> $DIR/cannot-be-called.rs:67:5
+    |
+ LL |     riscv_s();
+    |     ^^^^^^^^^
+ 
+ error: functions with the "riscv-interrupt-m" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:90:5
++  --> $DIR/cannot-be-called.rs:91:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "riscv-interrupt-m"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:90:5
++  --> $DIR/cannot-be-called.rs:91:5
+    |
+ LL |     f()
+    |     ^^^
+ 
+ error: functions with the "riscv-interrupt-s" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:96:5
++  --> $DIR/cannot-be-called.rs:97:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "riscv-interrupt-s"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:96:5
++  --> $DIR/cannot-be-called.rs:97:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.x64.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.x64.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "x86-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:68:5
++  --> $DIR/cannot-be-called.rs:69:5
+    |
+ LL |     x86(&raw const BYTE);
+    |     ^^^^^^^^^^^^^^^^^^^^
+    |
+ note: an `extern "x86-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:68:5
++  --> $DIR/cannot-be-called.rs:69:5
+    |
+ LL |     x86(&raw const BYTE);
+    |     ^^^^^^^^^^^^^^^^^^^^
+ 
+ error: functions with the "x86-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:102:5
++  --> $DIR/cannot-be-called.rs:103:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "x86-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:102:5
++  --> $DIR/cannot-be-called.rs:103:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-called.x64_win.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-called.x64_win.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,83 +1,83 @@
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:43:8
++  --> $DIR/cannot-be-called.rs:44:8
+    |
+ LL | extern "msp430-interrupt" fn msp430() {}
+    |        ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:45:8
++  --> $DIR/cannot-be-called.rs:46:8
+    |
+ LL | extern "avr-interrupt" fn avr() {}
+    |        ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:47:8
++  --> $DIR/cannot-be-called.rs:48:8
+    |
+ LL | extern "riscv-interrupt-m" fn riscv_m() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:49:8
++  --> $DIR/cannot-be-called.rs:50:8
+    |
+ LL | extern "riscv-interrupt-s" fn riscv_s() {}
+    |        ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:53:8
++  --> $DIR/cannot-be-called.rs:54:8
+    |
+ LL | extern "gpu-kernel" fn gpu_kernel() {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0570]: "avr-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:76:22
++  --> $DIR/cannot-be-called.rs:77:22
+    |
+ LL | fn avr_ptr(f: extern "avr-interrupt" fn()) {
+    |                      ^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "msp430-interrupt" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:82:25
++  --> $DIR/cannot-be-called.rs:83:25
+    |
+ LL | fn msp430_ptr(f: extern "msp430-interrupt" fn()) {
+    |                         ^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-m" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:88:26
++  --> $DIR/cannot-be-called.rs:89:26
+    |
+ LL | fn riscv_m_ptr(f: extern "riscv-interrupt-m" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "riscv-interrupt-s" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:94:26
++  --> $DIR/cannot-be-called.rs:95:26
+    |
+ LL | fn riscv_s_ptr(f: extern "riscv-interrupt-s" fn()) {
+    |                          ^^^^^^^^^^^^^^^^^^^
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/cannot-be-called.rs:106:29
++  --> $DIR/cannot-be-called.rs:107:29
+    |
+ LL | fn gpu_kernel_ptr(f: extern "gpu-kernel" fn()) {
+    |                             ^^^^^^^^^^^^
+ 
+ error: functions with the "x86-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:68:5
++  --> $DIR/cannot-be-called.rs:69:5
+    |
+ LL |     x86(&raw const BYTE);
+    |     ^^^^^^^^^^^^^^^^^^^^
+    |
+ note: an `extern "x86-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:68:5
++  --> $DIR/cannot-be-called.rs:69:5
+    |
+ LL |     x86(&raw const BYTE);
+    |     ^^^^^^^^^^^^^^^^^^^^
+ 
+ error: functions with the "x86-interrupt" ABI cannot be called
+-  --> $DIR/cannot-be-called.rs:102:5
++  --> $DIR/cannot-be-called.rs:103:5
+    |
+ LL |     f()
+    |     ^^^
+    |
+ note: an `extern "x86-interrupt"` function can only be called using inline assembly
+-  --> $DIR/cannot-be-called.rs:102:5
++  --> $DIR/cannot-be-called.rs:103:5
+    |
+ LL |     f()
+    |     ^^^
+--- a/tests/ui/abi/cannot-be-coroutine.amdgpu.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.amdgpu.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "gpu-kernel" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:62:1
++  --> $DIR/cannot-be-coroutine.rs:63:1
+    |
+ LL | async extern "gpu-kernel" fn async_kernel() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.avr.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.avr.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "avr-interrupt" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:42:1
++  --> $DIR/cannot-be-coroutine.rs:43:1
+    |
+ LL | async extern "avr-interrupt" fn avr() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.i686.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.i686.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "x86-interrupt" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:58:1
++  --> $DIR/cannot-be-coroutine.rs:59:1
+    |
+ LL | async extern "x86-interrupt" fn x86(_p: *mut ()) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.msp430.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.msp430.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "msp430-interrupt" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:46:1
++  --> $DIR/cannot-be-coroutine.rs:47:1
+    |
+ LL | async extern "msp430-interrupt" fn msp430() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.nvptx.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.nvptx.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "gpu-kernel" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:62:1
++  --> $DIR/cannot-be-coroutine.rs:63:1
+    |
+ LL | async extern "gpu-kernel" fn async_kernel() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.riscv32.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.riscv32.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "riscv-interrupt-m" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:50:1
++  --> $DIR/cannot-be-coroutine.rs:51:1
+    |
+ LL | async extern "riscv-interrupt-m" fn riscv_m() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: functions with the "riscv-interrupt-s" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:54:1
++  --> $DIR/cannot-be-coroutine.rs:55:1
+    |
+ LL | async extern "riscv-interrupt-s" fn riscv_s() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -23,7 +23,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.riscv64.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.riscv64.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "riscv-interrupt-m" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:50:1
++  --> $DIR/cannot-be-coroutine.rs:51:1
+    |
+ LL | async extern "riscv-interrupt-m" fn riscv_m() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: functions with the "riscv-interrupt-s" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:54:1
++  --> $DIR/cannot-be-coroutine.rs:55:1
+    |
+ LL | async extern "riscv-interrupt-s" fn riscv_s() {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -23,7 +23,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.x64.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.x64.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "x86-interrupt" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:58:1
++  --> $DIR/cannot-be-coroutine.rs:59:1
+    |
+ LL | async extern "x86-interrupt" fn x86(_p: *mut ()) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-be-coroutine.x64_win.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-be-coroutine.x64_win.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error: functions with the "x86-interrupt" ABI cannot be `async`
+-  --> $DIR/cannot-be-coroutine.rs:58:1
++  --> $DIR/cannot-be-coroutine.rs:59:1
+    |
+ LL | async extern "x86-interrupt" fn x86(_p: *mut ()) {
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+@@ -11,7 +11,7 @@
+    |
+ 
+ error: requires `ResumeTy` lang_item
+-  --> $DIR/cannot-be-coroutine.rs:38:19
++  --> $DIR/cannot-be-coroutine.rs:39:19
+    |
+ LL |   async fn vanilla(){
+    |  ___________________^
+--- a/tests/ui/abi/cannot-return.amdgpu.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-return.amdgpu.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,12 +1,12 @@
+ error: invalid signature for `extern "gpu-kernel"` function
+-  --> $DIR/cannot-return.rs:17:37
++  --> $DIR/cannot-return.rs:18:37
+    |
+ LL | extern "gpu-kernel" fn ret_i32() -> i32 { 0 }
+    |                                     ^^^
+    |
+    = note: functions with the "gpu-kernel" ABI cannot have a return type
+ help: remove the return type
+-  --> $DIR/cannot-return.rs:17:37
++  --> $DIR/cannot-return.rs:18:37
+    |
+ LL | extern "gpu-kernel" fn ret_i32() -> i32 { 0 }
+    |                                     ^^^
+--- a/tests/ui/abi/cannot-return.nvptx.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/abi/cannot-return.nvptx.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,12 +1,12 @@
+ error: invalid signature for `extern "gpu-kernel"` function
+-  --> $DIR/cannot-return.rs:17:37
++  --> $DIR/cannot-return.rs:18:37
+    |
+ LL | extern "gpu-kernel" fn ret_i32() -> i32 { 0 }
+    |                                     ^^^
+    |
+    = note: functions with the "gpu-kernel" ABI cannot have a return type
+ help: remove the return type
+-  --> $DIR/cannot-return.rs:17:37
++  --> $DIR/cannot-return.rs:18:37
+    |
+ LL | extern "gpu-kernel" fn ret_i32() -> i32 { 0 }
+    |                                     ^^^
+--- a/tests/ui/feature-gates/feature-gate-abi_gpu_kernel.AMDGPU.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/feature-gates/feature-gate-abi_gpu_kernel.AMDGPU.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:17:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:18:8
+    |
+ LL | extern "gpu-kernel" fn f1(_: ()) {}
+    |        ^^^^^^^^^^^^
+@@ -9,7 +9,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:22:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:23:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ());
+    |            ^^^^^^^^^^^^
+@@ -19,7 +19,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:25:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:26:12
+    |
+ LL |     extern "gpu-kernel" fn dm1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -29,7 +29,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:33:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:34:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -39,7 +39,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:39:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:40:12
+    |
+ LL |     extern "gpu-kernel" fn im1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -49,7 +49,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:44:18
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:45:18
+    |
+ LL | type A1 = extern "gpu-kernel" fn(_: ());
+    |                  ^^^^^^^^^^^^
+@@ -59,7 +59,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:48:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:49:8
+    |
+ LL | extern "gpu-kernel" {}
+    |        ^^^^^^^^^^^^
+--- a/tests/ui/feature-gates/feature-gate-abi_gpu_kernel.HOST.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/feature-gates/feature-gate-abi_gpu_kernel.HOST.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,11 +1,11 @@
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:17:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:18:8
+    |
+ LL | extern "gpu-kernel" fn f1(_: ()) {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:17:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:18:8
+    |
+ LL | extern "gpu-kernel" fn f1(_: ()) {}
+    |        ^^^^^^^^^^^^
+@@ -15,13 +15,13 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:22:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:23:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ());
+    |            ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:22:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:23:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ());
+    |            ^^^^^^^^^^^^
+@@ -31,13 +31,13 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:25:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:26:12
+    |
+ LL |     extern "gpu-kernel" fn dm1(_: ()) {}
+    |            ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:25:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:26:12
+    |
+ LL |     extern "gpu-kernel" fn dm1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -47,13 +47,13 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:33:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:34:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ()) {}
+    |            ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:33:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:34:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -63,13 +63,13 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:39:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:40:12
+    |
+ LL |     extern "gpu-kernel" fn im1(_: ()) {}
+    |            ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:39:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:40:12
+    |
+ LL |     extern "gpu-kernel" fn im1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -79,13 +79,13 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:44:18
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:45:18
+    |
+ LL | type A1 = extern "gpu-kernel" fn(_: ());
+    |                  ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:44:18
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:45:18
+    |
+ LL | type A1 = extern "gpu-kernel" fn(_: ());
+    |                  ^^^^^^^^^^^^
+@@ -95,13 +95,13 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0570]: "gpu-kernel" is not a supported ABI for the current target
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:48:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:49:8
+    |
+ LL | extern "gpu-kernel" {}
+    |        ^^^^^^^^^^^^
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:48:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:49:8
+    |
+ LL | extern "gpu-kernel" {}
+    |        ^^^^^^^^^^^^
+--- a/tests/ui/feature-gates/feature-gate-abi_gpu_kernel.NVPTX.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/feature-gates/feature-gate-abi_gpu_kernel.NVPTX.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:17:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:18:8
+    |
+ LL | extern "gpu-kernel" fn f1(_: ()) {}
+    |        ^^^^^^^^^^^^
+@@ -9,7 +9,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:22:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:23:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ());
+    |            ^^^^^^^^^^^^
+@@ -19,7 +19,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:25:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:26:12
+    |
+ LL |     extern "gpu-kernel" fn dm1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -29,7 +29,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:33:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:34:12
+    |
+ LL |     extern "gpu-kernel" fn m1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -39,7 +39,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:39:12
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:40:12
+    |
+ LL |     extern "gpu-kernel" fn im1(_: ()) {}
+    |            ^^^^^^^^^^^^
+@@ -49,7 +49,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:44:18
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:45:18
+    |
+ LL | type A1 = extern "gpu-kernel" fn(_: ());
+    |                  ^^^^^^^^^^^^
+@@ -59,7 +59,7 @@
+    = note: this compiler was built on YYYY-MM-DD; consider upgrading it if it is out of date
+ 
+ error[E0658]: the extern "gpu-kernel" ABI is experimental and subject to change
+-  --> $DIR/feature-gate-abi_gpu_kernel.rs:48:8
++  --> $DIR/feature-gate-abi_gpu_kernel.rs:49:8
+    |
+ LL | extern "gpu-kernel" {}
+    |        ^^^^^^^^^^^^
+--- a/tests/ui/lint/lint-gpu-kernel.amdgpu.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/lint/lint-gpu-kernel.amdgpu.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ warning: `extern` fn uses type `()`, which is not FFI-safe
+-  --> $DIR/lint-gpu-kernel.rs:36:35
++  --> $DIR/lint-gpu-kernel.rs:37:35
+    |
+ LL | extern "gpu-kernel" fn arg_zst(_: ()) { }
+    |                                   ^^ not FFI-safe
+@@ -9,7 +9,7 @@
+    = note: `#[warn(improper_ctypes_definitions)]` on by default
+ 
+ warning: passing type `()` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:36:35
++  --> $DIR/lint-gpu-kernel.rs:37:35
+    |
+ LL | extern "gpu-kernel" fn arg_zst(_: ()) { }
+    |                                   ^^
+@@ -18,7 +18,7 @@
+    = note: `#[warn(improper_gpu_kernel_arg)]` on by default
+ 
+ warning: passing type `&i32` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:41:35
++  --> $DIR/lint-gpu-kernel.rs:42:35
+    |
+ LL | extern "gpu-kernel" fn arg_ref(_: &i32) { }
+    |                                   ^^^^
+@@ -26,7 +26,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: passing type `&mut i32` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:44:39
++  --> $DIR/lint-gpu-kernel.rs:45:39
+    |
+ LL | extern "gpu-kernel" fn arg_ref_mut(_: &mut i32) { }
+    |                                       ^^^^^^^^
+@@ -34,7 +34,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: `extern` fn uses type `S`, which is not FFI-safe
+-  --> $DIR/lint-gpu-kernel.rs:49:38
++  --> $DIR/lint-gpu-kernel.rs:50:38
+    |
+ LL | extern "gpu-kernel" fn arg_struct(_: S) { }
+    |                                      ^ not FFI-safe
+@@ -42,13 +42,13 @@
+    = help: consider adding a `#[repr(C)]` or `#[repr(transparent)]` attribute to this struct
+    = note: this struct has unspecified layout
+ note: the type is defined here
+-  --> $DIR/lint-gpu-kernel.rs:47:1
++  --> $DIR/lint-gpu-kernel.rs:48:1
+    |
+ LL | struct S { a: i32, b: i32 }
+    | ^^^^^^^^
+ 
+ warning: passing type `S` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:49:38
++  --> $DIR/lint-gpu-kernel.rs:50:38
+    |
+ LL | extern "gpu-kernel" fn arg_struct(_: S) { }
+    |                                      ^
+@@ -56,7 +56,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: `extern` fn uses type `(i32, i32)`, which is not FFI-safe
+-  --> $DIR/lint-gpu-kernel.rs:54:35
++  --> $DIR/lint-gpu-kernel.rs:55:35
+    |
+ LL | extern "gpu-kernel" fn arg_tup(_: (i32, i32)) { }
+    |                                   ^^^^^^^^^^ not FFI-safe
+@@ -65,7 +65,7 @@
+    = note: tuples have unspecified layout
+ 
+ warning: passing type `(i32, i32)` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:54:35
++  --> $DIR/lint-gpu-kernel.rs:55:35
+    |
+ LL | extern "gpu-kernel" fn arg_tup(_: (i32, i32)) { }
+    |                                   ^^^^^^^^^^
+@@ -73,7 +73,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: function with the "gpu-kernel" ABI has a mangled name
+-  --> $DIR/lint-gpu-kernel.rs:61:1
++  --> $DIR/lint-gpu-kernel.rs:62:1
+    |
+ LL | pub extern "gpu-kernel" fn mangled_kernel() { }
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+--- a/tests/ui/lint/lint-gpu-kernel.nvptx.stderr	2026-04-14 21:55:32.000000000 +0200
++++ b/tests/ui/lint/lint-gpu-kernel.nvptx.stderr	2026-07-10 14:47:12.071354896 +0200
+@@ -1,5 +1,5 @@
+ warning: `extern` fn uses type `()`, which is not FFI-safe
+-  --> $DIR/lint-gpu-kernel.rs:36:35
++  --> $DIR/lint-gpu-kernel.rs:37:35
+    |
+ LL | extern "gpu-kernel" fn arg_zst(_: ()) { }
+    |                                   ^^ not FFI-safe
+@@ -9,7 +9,7 @@
+    = note: `#[warn(improper_ctypes_definitions)]` on by default
+ 
+ warning: passing type `()` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:36:35
++  --> $DIR/lint-gpu-kernel.rs:37:35
+    |
+ LL | extern "gpu-kernel" fn arg_zst(_: ()) { }
+    |                                   ^^
+@@ -18,7 +18,7 @@
+    = note: `#[warn(improper_gpu_kernel_arg)]` on by default
+ 
+ warning: passing type `&i32` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:41:35
++  --> $DIR/lint-gpu-kernel.rs:42:35
+    |
+ LL | extern "gpu-kernel" fn arg_ref(_: &i32) { }
+    |                                   ^^^^
+@@ -26,7 +26,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: passing type `&mut i32` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:44:39
++  --> $DIR/lint-gpu-kernel.rs:45:39
+    |
+ LL | extern "gpu-kernel" fn arg_ref_mut(_: &mut i32) { }
+    |                                       ^^^^^^^^
+@@ -34,7 +34,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: `extern` fn uses type `S`, which is not FFI-safe
+-  --> $DIR/lint-gpu-kernel.rs:49:38
++  --> $DIR/lint-gpu-kernel.rs:50:38
+    |
+ LL | extern "gpu-kernel" fn arg_struct(_: S) { }
+    |                                      ^ not FFI-safe
+@@ -42,13 +42,13 @@
+    = help: consider adding a `#[repr(C)]` or `#[repr(transparent)]` attribute to this struct
+    = note: this struct has unspecified layout
+ note: the type is defined here
+-  --> $DIR/lint-gpu-kernel.rs:47:1
++  --> $DIR/lint-gpu-kernel.rs:48:1
+    |
+ LL | struct S { a: i32, b: i32 }
+    | ^^^^^^^^
+ 
+ warning: passing type `S` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:49:38
++  --> $DIR/lint-gpu-kernel.rs:50:38
+    |
+ LL | extern "gpu-kernel" fn arg_struct(_: S) { }
+    |                                      ^
+@@ -56,7 +56,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: `extern` fn uses type `(i32, i32)`, which is not FFI-safe
+-  --> $DIR/lint-gpu-kernel.rs:54:35
++  --> $DIR/lint-gpu-kernel.rs:55:35
+    |
+ LL | extern "gpu-kernel" fn arg_tup(_: (i32, i32)) { }
+    |                                   ^^^^^^^^^^ not FFI-safe
+@@ -65,7 +65,7 @@
+    = note: tuples have unspecified layout
+ 
+ warning: passing type `(i32, i32)` to a function with "gpu-kernel" ABI may have unexpected behavior
+-  --> $DIR/lint-gpu-kernel.rs:54:35
++  --> $DIR/lint-gpu-kernel.rs:55:35
+    |
+ LL | extern "gpu-kernel" fn arg_tup(_: (i32, i32)) { }
+    |                                   ^^^^^^^^^^
+@@ -73,7 +73,7 @@
+    = help: use primitive types and raw pointers to get reliable behavior
+ 
+ warning: function with the "gpu-kernel" ABI has a mangled name
+-  --> $DIR/lint-gpu-kernel.rs:61:1
++  --> $DIR/lint-gpu-kernel.rs:62:1
+    |
+ LL | pub extern "gpu-kernel" fn mangled_kernel() { }
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

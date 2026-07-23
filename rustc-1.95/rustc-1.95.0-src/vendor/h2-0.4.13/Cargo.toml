@@ -1,0 +1,107 @@
+[dependencies.atomic-waker]
+version = "1.0.0"
+
+[dependencies.bytes]
+version = "1"
+
+[dependencies.fnv]
+version = "1.0.5"
+
+[dependencies.futures-core]
+default-features = false
+version = "0.3"
+
+[dependencies.futures-sink]
+default-features = false
+version = "0.3"
+
+[dependencies.http]
+version = "1"
+
+[dependencies.indexmap]
+features = ["std"]
+version = "2"
+
+[dependencies.slab]
+version = "0.4.2"
+
+[dependencies.tokio]
+features = ["io-util"]
+version = "1"
+
+[dependencies.tokio-util]
+features = ["codec", "io"]
+version = "0.7.1"
+
+[dependencies.tracing]
+default-features = false
+features = ["std"]
+version = "0.1.35"
+
+[dev-dependencies.env_logger]
+default-features = false
+version = "0.10"
+
+[dev-dependencies.hex]
+version = "0.4.3"
+
+[dev-dependencies.quickcheck]
+default-features = false
+version = "1.0.3"
+
+[dev-dependencies.rand]
+version = "0.8.4"
+
+[dev-dependencies.serde]
+version = "1.0.0"
+
+[dev-dependencies.serde_json]
+version = "1.0.0"
+
+[dev-dependencies.tokio]
+features = ["rt-multi-thread", "macros", "sync", "net"]
+version = "1"
+
+[dev-dependencies.tokio-rustls]
+version = "0.26"
+
+[dev-dependencies.walkdir]
+version = "2.3.2"
+
+[dev-dependencies.webpki-roots]
+version = "1"
+
+[features]
+stream = []
+unstable = []
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(fuzzing)"]
+level = "warn"
+priority = 0
+
+[package]
+authors = ["Carl Lerche <me@carllerche.com>", "Sean McArthur <sean@seanmonstar.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["asynchronous", "web-programming", "network-programming"]
+description = "An HTTP/2 client and server"
+documentation = "https://docs.rs/h2"
+edition = "2021"
+exclude = ["fixtures/**", "ci/**"]
+keywords = ["http", "async", "non-blocking"]
+license = "MIT"
+name = "h2"
+readme = "README.md"
+repository = "https://github.com/hyperium/h2"
+rust-version = "1.63"
+version = "0.4.13"
+
+[package.metadata.docs.rs]
+features = ["stream"]

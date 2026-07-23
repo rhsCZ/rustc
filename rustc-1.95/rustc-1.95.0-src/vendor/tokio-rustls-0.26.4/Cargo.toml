@@ -1,0 +1,61 @@
+[dependencies.rustls]
+default-features = false
+features = ["std"]
+version = "0.23.27"
+
+[dependencies.tokio]
+version = "1.0"
+
+[dev-dependencies.argh]
+version = "0.1.1"
+
+[dev-dependencies.futures-util]
+version = "0.3.1"
+
+[dev-dependencies.lazy_static]
+version = "1.1"
+
+[dev-dependencies.rcgen]
+features = ["pem"]
+version = "0.14"
+
+[dev-dependencies.tokio]
+features = ["full"]
+version = "1.0"
+
+[dev-dependencies.webpki-roots]
+version = "1"
+
+[features]
+aws-lc-rs = ["aws_lc_rs"]
+aws_lc_rs = ["rustls/aws_lc_rs"]
+brotli = ["rustls/brotli"]
+default = ["logging", "tls12", "aws_lc_rs"]
+early-data = []
+fips = ["rustls/fips"]
+logging = ["rustls/logging"]
+ring = ["rustls/ring"]
+tls12 = ["rustls/tls12"]
+zlib = ["rustls/zlib"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["asynchronous", "cryptography", "network-programming"]
+description = "Asynchronous TLS/SSL streams for Tokio using Rustls."
+documentation = "https://docs.rs/tokio-rustls"
+edition = "2021"
+exclude = ["/.github", "/examples", "/scripts"]
+homepage = "https://github.com/rustls/tokio-rustls"
+license = "MIT OR Apache-2.0"
+name = "tokio-rustls"
+readme = "README.md"
+repository = "https://github.com/rustls/tokio-rustls"
+rust-version = "1.71"
+version = "0.26.4"

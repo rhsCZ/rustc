@@ -1,0 +1,36 @@
+[dependencies]
+
+[dev-dependencies.futures]
+version = "0.3.22"
+
+[dev-dependencies.http]
+version = "0.2"
+
+[dev-dependencies.tokio]
+features = ["macros", "time"]
+version = "1.6.2"
+
+[dev-dependencies.tower-layer]
+version = "0.3"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Tower Maintainers <team@tower-rs.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autotests = false
+categories = ["asynchronous", "network-programming"]
+description = """
+Trait representing an asynchronous, request / response based, client or server.
+"""
+documentation = "https://docs.rs/tower-service/0.3.3"
+edition = "2018"
+homepage = "https://github.com/tower-rs/tower"
+license = "MIT"
+name = "tower-service"
+readme = "README.md"
+repository = "https://github.com/tower-rs/tower"
+version = "0.3.3"

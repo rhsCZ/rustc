@@ -1,0 +1,33 @@
+[dependencies.core]
+optional = true
+package = "rustc-std-workspace-core"
+version = "1.0.0"
+
+[dependencies.r-efi]
+version = "5.2.0"
+
+[features]
+allocator_api = []
+native = []
+rustc-dep-of-std = ["core"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["embedded", "hardware-support", "memory-management", "no-std", "os"]
+description = "UEFI Memory Allocator Integration"
+edition = "2018"
+homepage = "https://github.com/r-efi/r-efi/wiki"
+keywords = ["efi", "uefi", "firmware", "alloc", "memory"]
+license = "MIT OR Apache-2.0 OR LGPL-2.1-or-later"
+name = "r-efi-alloc"
+readme = "README.md"
+repository = "https://github.com/r-efi/r-efi-alloc"
+rust-version = "1.68"
+version = "2.1.0"

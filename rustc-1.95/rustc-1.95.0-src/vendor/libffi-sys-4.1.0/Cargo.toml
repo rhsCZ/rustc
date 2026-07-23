@@ -1,0 +1,53 @@
+[build-dependencies.cc]
+version = "1.0"
+
+[features]
+check_only = []
+complex = []
+default = ["std"]
+std = []
+system = []
+
+[lib]
+path = "src/lib.rs"
+
+[lints.clippy]
+complexity = "warn"
+correctness = "warn"
+perf = "warn"
+style = "warn"
+suspicious = "warn"
+unreadable_literal = "warn"
+
+[lints.clippy.module_inception]
+level = "allow"
+priority = 1
+
+[lints.clippy.must_use_candidate]
+level = "allow"
+priority = 1
+
+[lints.clippy.wildcard_imports]
+level = "allow"
+priority = 1
+
+[package]
+authors = ["Jesse A. Tov <jesse.tov@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["development-tools::ffi"]
+description = "Raw Rust bindings for libffi"
+edition = "2021"
+keywords = ["ffi", "libffi", "closure", "c"]
+license = "MIT/Apache-2.0"
+name = "libffi-sys"
+readme = "README.md"
+repository = "https://github.com/libffi-rs/libffi-rs"
+rust-version = "1.78"
+version = "4.1.0"
+
+[package.metadata.docs.rs]
+features = ["std", "system"]

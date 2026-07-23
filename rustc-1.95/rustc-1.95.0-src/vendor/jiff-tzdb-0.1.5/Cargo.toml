@@ -1,0 +1,23 @@
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Andrew Gallant <jamslam@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["date-and-time"]
+description = "The entire Time Zone Database embedded into your binary."
+documentation = "https://docs.rs/jiff-tzdb"
+edition = "2021"
+homepage = "https://github.com/BurntSushi/jiff/tree/master/crates/jiff-tzdb"
+include = ["/*.rs", "/*.dat", "COPYING", "LICENSE-MIT", "UNLICENSE"]
+keywords = ["date", "time", "temporal", "zone", "iana"]
+license = "Unlicense OR MIT"
+name = "jiff-tzdb"
+readme = "README.md"
+repository = "https://github.com/BurntSushi/jiff"
+rust-version = "1.70"
+version = "0.1.5"

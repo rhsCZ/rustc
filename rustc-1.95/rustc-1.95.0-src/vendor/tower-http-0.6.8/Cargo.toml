@@ -1,0 +1,208 @@
+[dependencies.async-compression]
+features = ["tokio"]
+optional = true
+version = "0.4"
+
+[dependencies.base64]
+optional = true
+version = "0.22"
+
+[dependencies.bitflags]
+version = "2.0.2"
+
+[dependencies.bytes]
+version = "1"
+
+[dependencies.futures-core]
+default-features = false
+optional = true
+version = "0.3"
+
+[dependencies.futures-util]
+default-features = false
+optional = true
+version = "0.3.14"
+
+[dependencies.http]
+version = "1.0"
+
+[dependencies.http-body]
+optional = true
+version = "1.0.0"
+
+[dependencies.http-body-util]
+optional = true
+version = "0.1.0"
+
+[dependencies.http-range-header]
+optional = true
+version = "0.4.0"
+
+[dependencies.httpdate]
+optional = true
+version = "1.0"
+
+[dependencies.iri-string]
+optional = true
+version = "0.7.0"
+
+[dependencies.mime]
+default-features = false
+optional = true
+version = "0.3.17"
+
+[dependencies.mime_guess]
+default-features = false
+optional = true
+version = "2"
+
+[dependencies.percent-encoding]
+optional = true
+version = "2.1.0"
+
+[dependencies.pin-project-lite]
+version = "0.2.7"
+
+[dependencies.tokio]
+default-features = false
+optional = true
+version = "1.6"
+
+[dependencies.tokio-util]
+default-features = false
+features = ["io"]
+optional = true
+version = "0.7"
+
+[dependencies.tower]
+optional = true
+version = "0.5"
+
+[dependencies.tower-layer]
+version = "0.3.3"
+
+[dependencies.tower-service]
+version = "0.3"
+
+[dependencies.tracing]
+default-features = false
+optional = true
+version = "0.1"
+
+[dependencies.uuid]
+features = ["v4"]
+optional = true
+version = "1.0"
+
+[dev-dependencies.brotli]
+version = "8"
+
+[dev-dependencies.bytes]
+version = "1"
+
+[dev-dependencies.flate2]
+version = "1.0"
+
+[dev-dependencies.futures-util]
+version = "0.3.14"
+
+[dev-dependencies.http-body]
+version = "1.0.0"
+
+[dev-dependencies.http-body-util]
+version = "0.1.0"
+
+[dev-dependencies.hyper-util]
+features = ["client-legacy", "http1", "tokio"]
+version = "0.1"
+
+[dev-dependencies.once_cell]
+version = "1"
+
+[dev-dependencies.serde_json]
+version = "1.0"
+
+[dev-dependencies.sync_wrapper]
+version = "1"
+
+[dev-dependencies.tokio]
+features = ["full"]
+version = "1"
+
+[dev-dependencies.tower]
+features = ["buffer", "util", "retry", "make", "timeout"]
+version = "0.5"
+
+[dev-dependencies.tracing-subscriber]
+version = "0.3"
+
+[dev-dependencies.zstd]
+version = "0.13"
+
+[features]
+add-extension = []
+auth = ["base64", "validate-request"]
+catch-panic = ["tracing", "futures-util/std", "dep:http-body", "dep:http-body-util"]
+compression-br = ["async-compression/brotli", "futures-core", "dep:http-body", "tokio-util", "tokio"]
+compression-deflate = ["async-compression/zlib", "futures-core", "dep:http-body", "tokio-util", "tokio"]
+compression-full = ["compression-br", "compression-deflate", "compression-gzip", "compression-zstd"]
+compression-gzip = ["async-compression/gzip", "futures-core", "dep:http-body", "tokio-util", "tokio"]
+compression-zstd = ["async-compression/zstd", "futures-core", "dep:http-body", "tokio-util", "tokio"]
+cors = []
+decompression-br = ["async-compression/brotli", "futures-core", "dep:http-body", "dep:http-body-util", "tokio-util", "tokio"]
+decompression-deflate = ["async-compression/zlib", "futures-core", "dep:http-body", "dep:http-body-util", "tokio-util", "tokio"]
+decompression-full = ["decompression-br", "decompression-deflate", "decompression-gzip", "decompression-zstd"]
+decompression-gzip = ["async-compression/gzip", "futures-core", "dep:http-body", "dep:http-body-util", "tokio-util", "tokio"]
+decompression-zstd = ["async-compression/zstd", "futures-core", "dep:http-body", "dep:http-body-util", "tokio-util", "tokio"]
+default = []
+follow-redirect = ["futures-util", "dep:http-body", "iri-string", "tower/util"]
+fs = ["futures-core", "futures-util", "dep:http-body", "dep:http-body-util", "tokio/fs", "tokio-util/io", "tokio/io-util", "dep:http-range-header", "mime_guess", "mime", "percent-encoding", "httpdate", "set-status", "futures-util/alloc", "tracing"]
+full = ["add-extension", "auth", "catch-panic", "compression-full", "cors", "decompression-full", "follow-redirect", "fs", "limit", "map-request-body", "map-response-body", "metrics", "normalize-path", "propagate-header", "redirect", "request-id", "sensitive-headers", "set-header", "set-status", "timeout", "trace", "util", "validate-request"]
+limit = ["dep:http-body", "dep:http-body-util"]
+map-request-body = []
+map-response-body = []
+metrics = ["dep:http-body", "tokio/time"]
+normalize-path = []
+propagate-header = []
+redirect = []
+request-id = ["uuid"]
+sensitive-headers = []
+set-header = []
+set-status = []
+timeout = ["dep:http-body", "tokio/time"]
+trace = ["dep:http-body", "tracing"]
+util = ["tower"]
+validate-request = ["mime"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Tower Maintainers <team@tower-rs.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["asynchronous", "network-programming", "web-programming"]
+description = "Tower middleware and utilities for HTTP clients and servers"
+edition = "2018"
+homepage = "https://github.com/tower-rs/tower-http"
+keywords = ["io", "async", "futures", "service", "http"]
+license = "MIT"
+name = "tower-http"
+readme = "README.md"
+repository = "https://github.com/tower-rs/tower-http"
+resolver = "2"
+rust-version = "1.64"
+version = "0.6.8"
+
+[package.metadata.cargo_check_external_types]
+allowed_external_types = ["bytes::*", "http::*", "http_body::*", "mime::*", "tokio::*", "tower::*", "tower_layer::*", "tower_service::*", "tracing::*", "tracing_core::*"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.playground]
+features = ["full"]
