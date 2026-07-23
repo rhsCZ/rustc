@@ -1,0 +1,7 @@
+rust-stage0-1.95/
+*.build
+*.buildinfo
+*.changes
+*.dsc
+*.src.tar.xz
+*.upload

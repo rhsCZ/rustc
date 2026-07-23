@@ -1,0 +1,33 @@
+[badges.travis-ci]
+repository = "nox/serde_urlencoded"
+
+[dependencies.form_urlencoded]
+version = "1"
+
+[dependencies.itoa]
+version = "1"
+
+[dependencies.ryu]
+version = "1"
+
+[dependencies.serde]
+version = "1.0.69"
+
+[dev-dependencies.serde_derive]
+version = "1"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Anthony Ramine <n.oxyde@gmail.com>"]
+categories = ["encoding", "web-programming"]
+description = "`x-www-form-urlencoded` meets Serde"
+documentation = "https://docs.rs/serde_urlencoded/0.7.1/serde_urlencoded/"
+edition = "2018"
+exclude = ["/.travis.yml", "/bors.toml"]
+keywords = ["serde", "serialization", "urlencoded"]
+license = "MIT/Apache-2.0"
+name = "serde_urlencoded"
+repository = "https://github.com/nox/serde_urlencoded"
+version = "0.7.1"

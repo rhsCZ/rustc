@@ -1,0 +1,49 @@
+[badges.maintenance]
+status = "actively-developed"
+
+[dependencies.once_cell]
+optional = true
+version = "1.13.0"
+
+[features]
+default = ["std", "valuable?/std"]
+std = ["once_cell"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(flaky_tests)", "cfg(tracing_unstable)"]
+level = "warn"
+priority = 0
+
+[package]
+authors = ["Tokio Contributors <team@tokio.rs>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autotests = false
+categories = ["development-tools::debugging", "development-tools::profiling", "asynchronous"]
+description = """
+Core primitives for application-level tracing.
+"""
+edition = "2018"
+homepage = "https://tokio.rs"
+keywords = ["logging", "tracing", "profiling"]
+license = "MIT"
+name = "tracing-core"
+readme = "README.md"
+repository = "https://github.com/tokio-rs/tracing"
+resolver = "2"
+rust-version = "1.63.0"
+version = "0.1.33"
+
+[package.metadata.docs.rs]
+all-features = true
+rustc-args = ["--cfg", "tracing_unstable"]
+rustdoc-args = ["--cfg", "docsrs", "--cfg", "tracing_unstable"]
+
+[target."cfg(tracing_unstable)".dependencies.valuable]
+default-features = false
+optional = true
+version = "0.1.0"

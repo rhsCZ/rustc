@@ -1,0 +1,163 @@
+[badges.maintenance]
+status = "experimental"
+
+[dependencies.chrono]
+default-features = false
+features = ["clock", "std"]
+optional = true
+version = "0.4.26"
+
+[dependencies.matchers]
+optional = true
+version = "0.1.0"
+
+[dependencies.nu-ansi-term]
+optional = true
+version = "0.46.0"
+
+[dependencies.once_cell]
+optional = true
+version = "1.13.0"
+
+[dependencies.parking_lot]
+optional = true
+version = "0.12.1"
+
+[dependencies.regex]
+default-features = false
+features = ["std", "unicode-case", "unicode-perl"]
+optional = true
+version = "1.6.0"
+
+[dependencies.serde]
+optional = true
+version = "1.0.140"
+
+[dependencies.serde_json]
+optional = true
+version = "1.0.82"
+
+[dependencies.sharded-slab]
+optional = true
+version = "0.1.4"
+
+[dependencies.smallvec]
+optional = true
+version = "1.9.0"
+
+[dependencies.thread_local]
+optional = true
+version = "1.1.4"
+
+[dependencies.time]
+features = ["formatting"]
+optional = true
+version = "0.3.2"
+
+[dependencies.tracing]
+default-features = false
+optional = true
+version = "0.1.41"
+
+[dependencies.tracing-core]
+default-features = false
+version = "0.1.30"
+
+[dependencies.tracing-log]
+default-features = false
+features = ["log-tracer", "std"]
+optional = true
+version = "0.2.0"
+
+[dependencies.tracing-serde]
+optional = true
+version = "0.2.0"
+
+[dev-dependencies.criterion]
+default-features = false
+version = "0.3.6"
+
+[dev-dependencies.log]
+version = "0.4.17"
+
+[dev-dependencies.regex]
+default-features = false
+features = ["std"]
+version = "1"
+
+[dev-dependencies.time]
+features = ["formatting", "macros"]
+version = "0.3.2"
+
+[dev-dependencies.tokio]
+features = ["rt", "macros"]
+version = "1"
+
+[dev-dependencies.tracing]
+version = "0.1.41"
+
+[dev-dependencies.tracing-futures]
+default-features = false
+features = ["std-future", "std"]
+version = "0.2.0"
+
+[dev-dependencies.tracing-log]
+version = "0.2.0"
+
+[features]
+alloc = []
+ansi = ["fmt", "nu-ansi-term"]
+default = ["smallvec", "fmt", "ansi", "tracing-log", "std"]
+env-filter = ["matchers", "regex", "once_cell", "tracing", "std", "thread_local"]
+fmt = ["registry", "std"]
+json = ["tracing-serde", "serde", "serde_json"]
+local-time = ["time/local-offset"]
+nu-ansi-term = ["dep:nu-ansi-term"]
+registry = ["sharded-slab", "thread_local", "std"]
+std = ["alloc", "tracing-core/std"]
+valuable = ["tracing-core/valuable", "valuable_crate", "valuable-serde", "tracing-serde/valuable"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(flaky_tests)", "cfg(tracing_unstable)"]
+level = "warn"
+priority = 0
+
+[package]
+authors = ["Eliza Weisman <eliza@buoyant.io>", "David Barsky <me@davidbarsky.com>", "Tokio Contributors <team@tokio.rs>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["development-tools::debugging", "development-tools::profiling", "asynchronous"]
+description = """
+Utilities for implementing and composing `tracing` subscribers.
+"""
+edition = "2018"
+homepage = "https://tokio.rs"
+keywords = ["logging", "tracing", "metrics", "subscriber"]
+license = "MIT"
+name = "tracing-subscriber"
+readme = "README.md"
+repository = "https://github.com/tokio-rs/tracing"
+resolver = "2"
+rust-version = "1.63.0"
+version = "0.3.19"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[target."cfg(tracing_unstable)".dependencies.valuable-serde]
+default-features = false
+optional = true
+version = "0.1.0"
+
+[target."cfg(tracing_unstable)".dependencies.valuable_crate]
+default-features = false
+optional = true
+package = "valuable"
+version = "0.1.0"

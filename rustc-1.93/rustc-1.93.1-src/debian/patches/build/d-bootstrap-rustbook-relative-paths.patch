@@ -1,0 +1,29 @@
+Description: Run rustbook from the book source directory
+ Rust 1.93's reference book invokes the in-tree mdbook-spec plugin via a
+ relative manifest path in book.toml. When bootstrap runs rustbook from the
+ source root, mdbook resolves that path against the wrong directory and the
+ documentation build aborts on Launchpad. Execute rustbook from the book's
+ source directory so mdbook resolves local plugin paths correctly.
+Author: Codex <codex@example.org>
+Forwarded: not-needed
+Last-Update: 2026-07-07
+
+--- a/src/bootstrap/src/core/build_steps/doc.rs
++++ b/src/bootstrap/src/core/build_steps/doc.rs
+@@ -166,6 +166,7 @@
+                 builder.add_rustc_lib_path(compiler, &mut rustbook_cmd);
+             }
+ 
++            rustbook_cmd.current_dir(&src);
+             rustbook_cmd
+                 .arg("build")
+                 .arg(&src)
+@@ -183,6 +184,7 @@
+ 
+                 builder
+                     .tool_cmd(Tool::Rustbook)
++                    .current_dir(&src)
+                     .arg("build")
+                     .arg(&src)
+                     .arg("-d")
+                     .arg("-d")

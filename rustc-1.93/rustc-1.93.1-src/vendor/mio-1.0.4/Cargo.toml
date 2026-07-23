@@ -1,0 +1,68 @@
+[dependencies.log]
+optional = true
+version = "0.4.8"
+
+[dev-dependencies.env_logger]
+default-features = false
+version = "0.9.3"
+
+[dev-dependencies.rand]
+version = "0.8"
+
+[features]
+default = ["log"]
+net = []
+os-ext = ["os-poll", "windows-sys/Win32_System_Pipes", "windows-sys/Win32_Security"]
+os-poll = []
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(mio_unsupported_force_poll_poll)", "cfg(mio_unsupported_force_waker_pipe)"]
+level = "warn"
+priority = 0
+
+[package]
+authors = ["Carl Lerche <me@carllerche.com>", "Thomas de Zeeuw <thomasdezeeuw@gmail.com>", "Tokio Contributors <team@tokio.rs>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["asynchronous"]
+description = "Lightweight non-blocking I/O."
+edition = "2021"
+homepage = "https://github.com/tokio-rs/mio"
+include = ["Cargo.toml", "LICENSE", "README.md", "CHANGELOG.md", "src/**/*.rs", "examples/**/*.rs"]
+keywords = ["io", "async", "non-blocking"]
+license = "MIT"
+name = "mio"
+readme = "README.md"
+repository = "https://github.com/tokio-rs/mio"
+rust-version = "1.70"
+version = "1.0.4"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--generate-link-to-definition"]
+targets = ["aarch64-apple-ios", "aarch64-linux-android", "wasm32-wasip1", "x86_64-apple-darwin", "x86_64-pc-windows-gnu", "x86_64-pc-windows-msvc", "x86_64-unknown-dragonfly", "x86_64-unknown-freebsd", "x86_64-unknown-illumos", "x86_64-unknown-linux-gnu", "x86_64-unknown-netbsd", "x86_64-unknown-openbsd", "x86_64-unknown-hermit"]
+
+[package.metadata.playground]
+features = ["os-poll", "os-ext", "net"]
+
+[target.'cfg(target_os = "hermit")'.dependencies.libc]
+version = "0.2.159"
+
+[target.'cfg(target_os = "wasi")'.dependencies.libc]
+version = "0.2.159"
+
+[target.'cfg(target_os = "wasi")'.dependencies.wasi]
+version = "0.11.0"
+
+[target."cfg(unix)".dependencies.libc]
+version = "0.2.159"
+
+[target."cfg(windows)".dependencies.windows-sys]
+features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Wdk_System_IO", "Win32_Foundation", "Win32_Networking_WinSock", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_WindowsProgramming"]
+version = "0.59"

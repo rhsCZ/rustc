@@ -1,0 +1,9 @@
+usr/lib/rust-${env:RUST_VERSION}/bin/rustc
+usr/lib/rust-${env:RUST_VERSION}/bin/rustdoc
+usr/lib/rust-${env:RUST_VERSION}/lib/rustlib/etc/rust_types.py
+usr/lib/rust-${env:RUST_VERSION}/libexec/rust-analyzer-proc-macro-srv
+usr/lib/rust-${env:RUST_VERSION}/lib/rustlib/${env:DEB_HOST_RUST_TYPE}/bin/
+etc/target-spec-json-schema.json usr/lib/rust-${env:RUST_VERSION}/etc/target-spec-json-schema.json
+debian/architecture.mk usr/share/rustc-${env:RUST_VERSION}/
+debian/wasi-node usr/share/rustc-${env:RUST_VERSION}/bin/
+Cargo.lock usr/share/doc/rustc-${env:RUST_VERSION}/
