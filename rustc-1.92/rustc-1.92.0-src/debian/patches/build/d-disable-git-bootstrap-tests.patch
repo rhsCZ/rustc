@@ -1,0 +1,79 @@
+Description: Disable tests which require an upstream Git repo
+ Certain tests require an upstream Git repo, which is incompatible with
+ the way we've packaged the toolchain.
+ .
+ Since these tests assert things that don't apply to our packaged
+ toolchain version, they can safely be disabled.
+Author: Max Gilmour <max.gilmour@canonical.com>
+Last-Update: 2025-08-19
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/bootstrap/src/core/builder/tests.rs
++++ b/src/bootstrap/src/core/builder/tests.rs
+@@ -162,7 +162,7 @@
+     }
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn ci_rustc_if_unchanged_invalidate_on_compiler_changes() {
+     git_test(|ctx| {
+         prepare_rustc_checkout(ctx);
+@@ -175,7 +175,7 @@
+     });
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn ci_rustc_if_unchanged_do_not_invalidate_on_library_changes_outside_ci() {
+     git_test(|ctx| {
+         prepare_rustc_checkout(ctx);
+@@ -188,7 +188,7 @@
+     });
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn ci_rustc_if_unchanged_do_not_invalidate_on_tool_changes() {
+     git_test(|ctx| {
+         prepare_rustc_checkout(ctx);
+@@ -350,7 +350,7 @@
+     }
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn test_prebuilt_llvm_config_path_resolution() {
+     fn configure(config: &str) -> Config {
+         TestCtx::new().config("build").with_default_toml_config(config).create_config()
+--- a/src/bootstrap/src/core/config/tests.rs
++++ b/src/bootstrap/src/core/config/tests.rs
+@@ -414,7 +414,7 @@
+     assert_eq!(config.jobs, Some(123));
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn check_rustc_if_unchanged_paths() {
+     let config = TestCtx::new().config("check").create_config();
+     let normalised_allowed_paths: Vec<_> = RUSTC_IF_UNCHANGED_ALLOWED_PATHS
+@@ -491,7 +491,7 @@
+     assert_eq!(first_excluded, exclude_path);
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn test_ci_flag() {
+     let config = TestCtx::new().config("check").arg("--ci").arg("false").create_config();
+     assert!(!config.is_running_on_ci);
+--- a/src/bootstrap/src/utils/helpers/tests.rs
++++ b/src/bootstrap/src/utils/helpers/tests.rs
+@@ -99,7 +99,7 @@
+     assert_eq!(found_metadata.modified().unwrap(), unix_epoch)
+ }
+ 
+-#[test]
++#[allow(dead_code)]
+ fn test_submodule_path_of() {
+     let config = TestCtx::new().config("build").create_config();
+ 

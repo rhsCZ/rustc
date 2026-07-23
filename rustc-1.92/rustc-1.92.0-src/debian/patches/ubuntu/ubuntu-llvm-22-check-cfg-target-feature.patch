@@ -1,0 +1,19 @@
+Description: Adjust check-cfg target_feature stderr for LLVM 22 backports
+ The LLVM 22 x86 target-feature backport drops `amx-transpose`, so the
+ expected values list in the UI test must match the patched compiler.
+Author: Codex <codex@example.org>
+Forwarded: not-needed
+Last-Update: 2026-07-05
+
+Index: rustc-1.92.0-src/tests/ui/check-cfg/target_feature.stderr
+===================================================================
+--- rustc-1.92.0-src.orig/tests/ui/check-cfg/target_feature.stderr
++++ rustc-1.92.0-src/tests/ui/check-cfg/target_feature.stderr
+@@ -27,7 +27,6 @@ LL |     cfg!(target_feature = "_UNEXPEC
+ `amx-movrs`
+ `amx-tf32`
+ `amx-tile`
+-`amx-transpose`
+ `apxf`
+ `atomics`
+ `avx`

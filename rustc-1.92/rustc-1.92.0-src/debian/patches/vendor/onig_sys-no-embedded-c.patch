@@ -1,0 +1,16 @@
+Description: onig_sys: Use the system library instead of the bundled one
+Author: Fabian Grünbichler <f.gruenbichler@proxmox.com>
+Last-Update: 2025-08-05
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/vendor/onig_sys-69.9.1/build.rs
++++ b/vendor/onig_sys-69.9.1/build.rs
+@@ -219,7 +219,7 @@
+ 
+ pub fn main() {
+     let link_type = link_type_override();
+-    let require_pkg_config = env_var_bool("RUSTONIG_SYSTEM_LIBONIG").unwrap_or(false);
++    let require_pkg_config = env_var_bool("RUSTONIG_SYSTEM_LIBONIG").unwrap_or(true);
+ 
+     if require_pkg_config || link_type == Some(LinkType::Dynamic) {
+         let mut conf = Config::new();

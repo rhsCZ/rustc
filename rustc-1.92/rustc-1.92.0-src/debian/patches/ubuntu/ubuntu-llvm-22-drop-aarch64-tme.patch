@@ -1,0 +1,19 @@
+Description: Ignore aarch64 tme for LLVM 22
+ ARM withdrew TME and LLVM 22 no longer recognizes the aarch64
+ target feature. Match newer rustc behavior by filtering it out
+ in the LLVM backend mapping.
+Author: Codex <codex@example.org>
+Forwarded: not-needed
+Last-Update: 2026-07-05
+
+--- a/compiler/rustc_codegen_llvm/src/llvm_util.rs
++++ b/compiler/rustc_codegen_llvm/src/llvm_util.rs
+@@ -244,6 +244,8 @@ pub(crate) fn to_llvm_features<'a>(sess:
+         ("aarch64", "fp16") => Some(LLVMFeature::new("fullfp16")),
+         // Filter out features that are not supported by the current LLVM version
+         ("aarch64", "fpmr") => None, // only existed in 18
++        // Withdrawn by ARM; removed from LLVM in 22
++        ("aarch64", "tme") if major >= 22 => None,
+         ("arm", "fp16") => Some(LLVMFeature::new("fullfp16")),
+         // Filter out features that are not supported by the current LLVM version
+         ("loongarch32" | "loongarch64", "32s") if major < 21 => None,

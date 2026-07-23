@@ -1,0 +1,22 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Thu, 13 Jun 2024 11:16:40 +0200
+Subject: run panics if lldb is not installed and no output is produced..
+
+Forwarded: no
+---
+ src/bootstrap/src/core/build_steps/test.rs | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+Index: rustc/src/bootstrap/src/core/build_steps/test.rs
+===================================================================
+--- rustc.orig/src/bootstrap/src/core/build_steps/test.rs
++++ rustc/src/bootstrap/src/core/build_steps/test.rs
+@@ -1861,7 +1861,7 @@ NOTE: if you're sure you want to do this
+                 .arg("-P")
+                 .run_capture_stdout(builder)
+                 .stdout_if_ok()
+-                .map(|p| p.lines().next().expect("lldb Python dir not found").to_string());
++                .map(|p| p.lines().next().unwrap_or("").to_string());
+             if let Some(ref dir) = lldb_python_dir {
+                 cmd.arg("--lldb-python-dir").arg(dir);
+             }

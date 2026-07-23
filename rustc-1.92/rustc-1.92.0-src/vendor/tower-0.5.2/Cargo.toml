@@ -1,0 +1,155 @@
+[dependencies.futures-core]
+optional = true
+version = "0.3.22"
+
+[dependencies.futures-util]
+default-features = false
+features = ["alloc"]
+optional = true
+version = "0.3.22"
+
+[dependencies.hdrhistogram]
+default-features = false
+optional = true
+version = "7.0"
+
+[dependencies.indexmap]
+optional = true
+version = "2.0.2"
+
+[dependencies.pin-project-lite]
+optional = true
+version = "0.2.7"
+
+[dependencies.slab]
+optional = true
+version = "0.4"
+
+[dependencies.sync_wrapper]
+optional = true
+version = "1"
+
+[dependencies.tokio]
+features = ["sync"]
+optional = true
+version = "1.6.2"
+
+[dependencies.tokio-stream]
+optional = true
+version = "0.1.0"
+
+[dependencies.tokio-util]
+default-features = false
+optional = true
+version = "0.7.0"
+
+[dependencies.tower-layer]
+version = "0.3.3"
+
+[dependencies.tower-service]
+version = "0.3.3"
+
+[dependencies.tracing]
+default-features = false
+features = ["std"]
+optional = true
+version = "0.1.2"
+
+[dev-dependencies.futures]
+version = "0.3.22"
+
+[dev-dependencies.hdrhistogram]
+default-features = false
+version = "7.0"
+
+[dev-dependencies.http]
+version = "1"
+
+[dev-dependencies.lazy_static]
+version = "1.4.0"
+
+[dev-dependencies.pin-project-lite]
+version = "0.2.7"
+
+[dev-dependencies.quickcheck]
+version = "1"
+
+[dev-dependencies.rand]
+features = ["small_rng"]
+version = "0.8"
+
+[dev-dependencies.tokio]
+features = ["macros", "sync", "test-util", "rt-multi-thread"]
+version = "1.6.2"
+
+[dev-dependencies.tokio-stream]
+version = "0.1.0"
+
+[dev-dependencies.tokio-test]
+version = "0.4"
+
+[dev-dependencies.tower-test]
+version = "0.4"
+
+[dev-dependencies.tracing]
+default-features = false
+features = ["std"]
+version = "0.1.2"
+
+[dev-dependencies.tracing-subscriber]
+default-features = false
+features = ["fmt", "ansi"]
+version = "0.3"
+
+[features]
+__common = ["futures-core", "pin-project-lite"]
+balance = ["discover", "load", "ready-cache", "make", "slab", "util"]
+buffer = ["__common", "tokio/sync", "tokio/rt", "tokio-util", "tracing"]
+discover = ["__common"]
+filter = ["__common", "futures-util"]
+full = ["balance", "buffer", "discover", "filter", "hedge", "limit", "load", "load-shed", "make", "ready-cache", "reconnect", "retry", "spawn-ready", "steer", "timeout", "util"]
+hedge = ["util", "filter", "futures-util", "hdrhistogram", "tokio/time", "tracing"]
+limit = ["__common", "tokio/time", "tokio/sync", "tokio-util", "tracing"]
+load = ["__common", "tokio/time", "tracing"]
+load-shed = ["__common"]
+log = ["tracing/log"]
+make = ["futures-util", "pin-project-lite", "tokio/io-std"]
+ready-cache = ["futures-core", "futures-util", "indexmap", "tokio/sync", "tracing", "pin-project-lite"]
+reconnect = ["make", "tokio/io-std", "tracing"]
+retry = ["__common", "tokio/time", "util"]
+spawn-ready = ["__common", "futures-util", "tokio/sync", "tokio/rt", "util", "tracing"]
+steer = []
+timeout = ["pin-project-lite", "tokio/time"]
+util = ["__common", "futures-util", "pin-project-lite", "sync_wrapper"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Tower Maintainers <team@tower-rs.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["asynchronous", "network-programming"]
+description = """
+Tower is a library of modular and reusable components for building robust
+clients and servers.
+"""
+edition = "2018"
+homepage = "https://github.com/tower-rs/tower"
+keywords = ["io", "async", "non-blocking", "futures", "service"]
+license = "MIT"
+name = "tower"
+readme = "README.md"
+repository = "https://github.com/tower-rs/tower"
+rust-version = "1.64.0"
+version = "0.5.2"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[package.metadata.playground]
+features = ["full"]

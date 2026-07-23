@@ -1,0 +1,44 @@
+[dependencies.zeroize]
+optional = true
+version = "1"
+
+[features]
+alloc = ["dep:zeroize"]
+default = ["alloc"]
+std = ["alloc"]
+web = ["web-time"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["network-programming", "data-structures", "cryptography"]
+description = "Shared types for the rustls PKI ecosystem"
+documentation = "https://docs.rs/rustls-pki-types"
+edition = "2021"
+homepage = "https://github.com/rustls/pki-types"
+license = "MIT OR Apache-2.0"
+name = "rustls-pki-types"
+readme = "README.md"
+repository = "https://github.com/rustls/pki-types"
+rust-version = "1.60"
+version = "1.12.0"
+
+[package.metadata.cargo_check_external_types]
+allowed_external_types = ["zeroize::Zeroize"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies.web-time]
+optional = true
+version = "1"
+
+[target.'cfg(all(target_os = "linux", target_arch = "x86_64"))'.dev-dependencies.crabgrind]
+version = "=0.1.9"

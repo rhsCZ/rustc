@@ -1,0 +1,22 @@
+Description: Use the LLVM 22 PassPlugin header path
+ LLVM 22 installs PassPlugin.h under llvm/Plugins rather than
+ llvm/Passes. Keep compatibility with older LLVM versions via
+ LLVM_VERSION_GE.
+Author: Codex <codex@example.org>
+Forwarded: not-needed
+Last-Update: 2026-07-05
+
+--- a/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
++++ b/compiler/rustc_llvm/llvm-wrapper/PassWrapper.cpp
+@@ -20,6 +20,10 @@
+ #include "llvm/Object/ObjectFile.h"
+ #include "llvm/Passes/PassBuilder.h"
+-#include "llvm/Passes/PassPlugin.h"
++#if LLVM_VERSION_GE(22, 0)
++#include "llvm/Plugins/PassPlugin.h"
++#else
++#include "llvm/Passes/PassPlugin.h"
++#endif
+ #include "llvm/Passes/StandardInstrumentations.h"
+ #include "llvm/Support/CBindingWrapping.h"
+ #include "llvm/Support/FileSystem.h"

@@ -1,0 +1,28 @@
+[dependencies.bytes]
+version = "1"
+
+[dependencies.http]
+version = "1"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Carl Lerche <me@carllerche.com>", "Lucio Franco <luciofranco14@gmail.com>", "Sean McArthur <sean@seanmonstar.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autotests = false
+categories = ["web-programming"]
+description = """
+Trait representing an asynchronous, streaming, HTTP request or response body.
+"""
+documentation = "https://docs.rs/http-body"
+edition = "2018"
+keywords = ["http"]
+license = "MIT"
+name = "http-body"
+readme = "README.md"
+repository = "https://github.com/hyperium/http-body"
+rust-version = "1.49"
+version = "1.0.1"

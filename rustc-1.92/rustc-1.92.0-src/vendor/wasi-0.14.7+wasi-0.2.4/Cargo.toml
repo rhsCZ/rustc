@@ -1,0 +1,29 @@
+[dependencies.wasip2]
+default-features = false
+version = "1.0.1"
+
+[features]
+bitflags = ["wasip2/bitflags"]
+default = ["wasip2/default"]
+std = ["wasip2/std"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["no-std", "wasm"]
+description = "WASI API bindings for Rust"
+documentation = "https://docs.rs/wasi"
+edition = "2021"
+keywords = ["webassembly", "wasm"]
+license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
+name = "wasi"
+readme = "README.md"
+repository = "https://github.com/bytecodealliance/wasi-rs"
+rust-version = "1.82.0"
+version = "0.14.7+wasi-0.2.4"

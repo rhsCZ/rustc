@@ -1,0 +1,50 @@
+[dependencies.base64]
+version = "0.22.0"
+
+[dependencies.indexmap]
+version = "2.1.0"
+
+[dependencies.quick_xml]
+package = "quick-xml"
+version = "0.38.0"
+
+[dependencies.serde]
+optional = true
+version = "1.0.2"
+
+[dependencies.time]
+features = ["parsing", "formatting"]
+version = "0.3.30"
+
+[dev-dependencies.serde_derive]
+version = "1.0.2"
+
+[dev-dependencies.serde_yaml]
+version = "0.8.21"
+
+[features]
+default = ["serde"]
+enable_unstable_features_that_may_break_with_minor_version_bumps = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Ed Barnard <eabarnard@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["config", "encoding", "parser-implementations"]
+description = "A rusty plist parser. Supports Serde serialization."
+documentation = "https://docs.rs/plist/"
+edition = "2021"
+exclude = ["/tests/data"]
+keywords = ["plist", "parser"]
+license = "MIT"
+name = "plist"
+readme = "README.md"
+repository = "https://github.com/ebarnard/rust-plist/"
+rust-version = "1.81"
+version = "1.8.0"

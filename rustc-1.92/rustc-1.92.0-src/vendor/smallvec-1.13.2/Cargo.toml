@@ -1,0 +1,48 @@
+[dependencies.arbitrary]
+optional = true
+version = "1"
+
+[dependencies.serde]
+default-features = false
+optional = true
+version = "1"
+
+[dev-dependencies.bincode]
+version = "1.0.1"
+
+[dev-dependencies.debugger_test]
+version = "0.1.0"
+
+[dev-dependencies.debugger_test_parser]
+version = "0.1.0"
+
+[features]
+const_generics = []
+const_new = ["const_generics"]
+debugger_visualizer = []
+drain_filter = []
+drain_keep_rest = ["drain_filter"]
+may_dangle = []
+specialization = []
+union = []
+write = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["The Servo Project Developers"]
+categories = ["data-structures"]
+description = "'Small vector' optimization: store up to a small number of items on the stack"
+documentation = "https://docs.rs/smallvec/"
+edition = "2018"
+keywords = ["small", "vec", "vector", "stack", "no_std"]
+license = "MIT OR Apache-2.0"
+name = "smallvec"
+readme = "README.md"
+repository = "https://github.com/servo/rust-smallvec"
+version = "1.13.2"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs", "--generate-link-to-definition"]

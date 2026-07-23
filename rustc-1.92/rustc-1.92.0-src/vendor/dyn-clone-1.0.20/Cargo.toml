@@ -1,0 +1,32 @@
+[dev-dependencies.rustversion]
+version = "1.0"
+
+[dev-dependencies.trybuild]
+features = ["diff"]
+version = "1.0.66"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Tolnay <dtolnay@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["rust-patterns", "no-std"]
+description = "Clone trait that is dyn-compatible"
+documentation = "https://docs.rs/dyn-clone"
+edition = "2018"
+keywords = ["dyn", "clone", "trait-object", "object-safe"]
+license = "MIT OR Apache-2.0"
+name = "dyn-clone"
+readme = "README.md"
+repository = "https://github.com/dtolnay/dyn-clone"
+rust-version = "1.60"
+version = "1.0.20"
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--generate-link-to-definition", "--extern-html-root-url=core=https://doc.rust-lang.org", "--extern-html-root-url=alloc=https://doc.rust-lang.org", "--extern-html-root-url=std=https://doc.rust-lang.org"]
+targets = ["x86_64-unknown-linux-gnu"]
