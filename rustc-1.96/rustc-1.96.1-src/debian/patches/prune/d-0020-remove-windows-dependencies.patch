@@ -1,0 +1,452 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Mon, 6 May 2024 10:25:32 +0200
+Subject: d-0020-remove-windows-dependencies
+
+use something like
+
+ find src compiler library -iname Cargo.toml -exec grep -H -n -e 'windows-sys' -e 'winapi' -e 'ntapi' -e 'wincon' -e 'winreg' -e 'windows' {} \;
+
+to find and eliminate dependencies on windows-only crates when rebasing.
+
+windows-bindgen and windows-metadata should not be removed, they are needed for
+the build and don't pull in windows-sys and friends.
+
+Forwarded: not-needed
+
+===================================================================
+---
+ compiler/rustc_codegen_ssa/Cargo.toml              |  4 ----
+ compiler/rustc_data_structures/Cargo.toml          | 10 ---------
+ compiler/rustc_driver_impl/Cargo.toml              |  6 -----
+ compiler/rustc_errors/Cargo.toml                   |  8 -------
+ compiler/rustc_session/Cargo.toml                  |  7 ------
+ library/backtrace/Cargo.toml                       | 13 -----------
+ src/bootstrap/Cargo.toml                           | 15 -------------
+ src/tools/cargo/Cargo.toml                         | 26 ++++------------------
+ .../cargo/crates/cargo-test-support/Cargo.toml     |  3 ---
+ src/tools/cargo/crates/cargo-util/Cargo.toml       |  7 ------
+ src/tools/cargo/crates/home/Cargo.toml             |  3 ---
+ .../cargo/credential/cargo-credential/Cargo.toml   |  3 ---
+ src/tools/cargo/src/cargo/util/auth/mod.rs         |  5 -----
+ src/tools/compiletest/Cargo.toml                   | 10 ---------
+ src/tools/rust-analyzer/crates/profile/Cargo.toml  |  3 ---
+ .../rust-analyzer/crates/rust-analyzer/Cargo.toml  |  6 -----
+ src/tools/rust-analyzer/crates/stdx/Cargo.toml     |  4 ----
+ 17 files changed, 4 insertions(+), 129 deletions(-)
+
+--- a/compiler/rustc_codegen_ssa/Cargo.toml
++++ b/compiler/rustc_codegen_ssa/Cargo.toml
+@@ -53,7 +53,3 @@
+ version = "0.37.0"
+ default-features = false
+ features = ["read_core", "elf", "macho", "pe", "xcoff", "unaligned", "archive", "write", "wasm"]
+-
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61.0"
+-features = ["Win32_Globalization"]
+--- a/compiler/rustc_data_structures/Cargo.toml
++++ b/compiler/rustc_data_structures/Cargo.toml
+@@ -35,16 +35,6 @@
+ default-features = false
+ features = ["nightly"] # for may_dangle
+ 
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Storage_FileSystem",
+-    "Win32_System_IO",
+-    "Win32_System_ProcessStatus",
+-    "Win32_System_Threading",
+-]
+-
+ [target.'cfg(unix)'.dependencies]
+ # tidy-alphabetical-start
+ libc = "0.2"
+@@ -53,7 +43,3 @@
+ [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+ # tidy-alphabetical-start
+ memmap2 = "0.2.1"
+-# tidy-alphabetical-end
+-
+-[target.'cfg(not(target_has_atomic = "64"))'.dependencies]
+-portable-atomic = "1.5.1"
+--- a/compiler/rustc_driver_impl/Cargo.toml
++++ b/compiler/rustc_driver_impl/Cargo.toml
+@@ -59,12 +59,6 @@
+ libc = "0.2"
+ # tidy-alphabetical-end
+ 
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61.0"
+-features = [
+-    "Win32_System_Diagnostics_Debug",
+-]
+-
+ [target.'cfg(not(target_family = "wasm"))'.dependencies]
+ # tidy-alphabetical-start
+ ctrlc = "3.4.4"
+--- a/compiler/rustc_errors/Cargo.toml
++++ b/compiler/rustc_errors/Cargo.toml
+@@ -27,11 +27,3 @@
+ termize = "0.2"
+ tracing = "0.1"
+ # tidy-alphabetical-end
+-
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Security",
+-    "Win32_System_Threading",
+-]
+--- a/compiler/rustc_session/Cargo.toml
++++ b/compiler/rustc_session/Cargo.toml
+@@ -30,10 +30,3 @@
+ # tidy-alphabetical-start
+ libc = "0.2"
+ # tidy-alphabetical-end
+-
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_LibraryLoader",
+-]
+--- a/src/bootstrap/Cargo.toml
++++ b/src/bootstrap/Cargo.toml
+@@ -66,21 +66,6 @@
+ tracing-subscriber = { version = "0.3", optional = true, features = ["env-filter", "fmt", "registry", "std"] }
+ tempfile = { version = "3.15.0", optional = true }
+ 
+-[target.'cfg(windows)'.dependencies.junction]
+-version = "1.3.0"
+-
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_Security",
+-    "Win32_System_Diagnostics_Debug",
+-    "Win32_System_JobObjects",
+-    "Win32_System_ProcessStatus",
+-    "Win32_System_Threading",
+-    "Win32_System_Time",
+-]
+-
+ [dev-dependencies]
+ pretty_assertions = "1.4"
+ tempfile = "3.15.0"
+--- a/src/tools/cargo/Cargo.toml
++++ b/src/tools/cargo/Cargo.toml
+@@ -2,7 +2,9 @@
+ resolver = "2"
+ members = [
+   "crates/*",
+-  "credential/*",
++  "credential/cargo-credential",
++  "credential/cargo-credential-1password",
++  "credential/cargo-credential-libsecret",
+   "benches/benchsuite",
+   "benches/capture",
+ ]
+@@ -28,8 +30,6 @@
+ cargo = { path = "" }
+ cargo-credential = { version = "0.4.2", path = "credential/cargo-credential" }
+ cargo-credential-libsecret = { version = "0.5.4", path = "credential/cargo-credential-libsecret" }
+-cargo-credential-macos-keychain = { version = "0.4.19", path = "credential/cargo-credential-macos-keychain" }
+-cargo-credential-wincred = { version = "0.4.19", path = "credential/cargo-credential-wincred" }
+ cargo-platform = { path = "crates/cargo-platform", version = "0.3.0" }
+ cargo-test-macro = { version = "0.4.8", path = "crates/cargo-test-macro" }
+ cargo-test-support = { version = "0.9.1", path = "crates/cargo-test-support" }
+@@ -39,7 +39,6 @@
+ clap = "4.5.53"
+ clap_complete = { version = "4.5.61", features = ["unstable-dynamic"] }
+ color-print = "0.3.7"
+-core-foundation = { version = "0.10.1", features = ["mac_os_10_7_support"] }
+ crates-io = { version = "0.40.16", path = "crates/crates-io" }
+ criterion = { version = "0.7.0", features = ["html_reports"] }
+ curl = "0.4.49"
+@@ -70,7 +69,6 @@
+ libloading = "0.8.9"
+ memchr = "2.7.6"
+ memfd = "0.6.5"
+-miow = "0.6.1"
+ opener = "0.8.3"
+ openssl = "0.10.75"
+ openssl-sys = "0.9.111"
+@@ -119,7 +117,6 @@
+ url = "2.5.7"
+ varisat = "0.2.2"
+ walkdir = "2.5.0"
+-windows-sys = "0.61"
+ winnow = "0.7.14"
+ 
+ [workspace.lints.rust]
+@@ -162,6 +159,7 @@
+ base64.workspace = true
+ blake3.workspace = true
+ cargo-credential.workspace = true
++cargo-credential-libsecret.workspace = true
+ cargo-platform.workspace = true
+ cargo-util-schemas.workspace = true
+ cargo-util.workspace = true
+@@ -233,27 +231,9 @@
+ [target.'cfg(target_os = "linux")'.dependencies]
+ cargo-credential-libsecret.workspace = true
+ 
+-[target.'cfg(target_os = "macos")'.dependencies]
+-cargo-credential-macos-keychain.workspace = true
+-
+ [target.'cfg(not(windows))'.dependencies]
+ openssl = { workspace = true, optional = true }
+ 
+-[target.'cfg(windows)'.dependencies]
+-cargo-credential-wincred.workspace = true
+-
+-[target.'cfg(windows)'.dependencies.windows-sys]
+-workspace = true
+-features = [
+-  "Win32_Foundation",
+-  "Win32_Security",
+-  "Win32_Storage_FileSystem",
+-  "Win32_System_IO",
+-  "Win32_System_Console",
+-  "Win32_System_JobObjects",
+-  "Win32_System_Threading",
+-]
+-
+ [dev-dependencies]
+ annotate-snippets = { workspace = true, features = ["testing-colors"] }
+ cargo-test-support.workspace = true
+--- a/src/tools/cargo/crates/cargo-test-support/Cargo.toml
++++ b/src/tools/cargo/crates/cargo-test-support/Cargo.toml
+@@ -31,8 +31,5 @@
+ url.workspace = true
+ walkdir.workspace = true
+ 
+-[target.'cfg(windows)'.dependencies]
+-windows-sys = { workspace = true, features = ["Win32_Storage_FileSystem"] }
+-
+ [lints]
+ workspace = true
+--- a/src/tools/cargo/crates/cargo-util/Cargo.toml
++++ b/src/tools/cargo/crates/cargo-util/Cargo.toml
+@@ -21,15 +21,8 @@
+ tracing.workspace = true
+ walkdir.workspace = true
+ 
+-[target.'cfg(target_os = "macos")'.dependencies]
+-core-foundation.workspace = true
+-
+ [target.'cfg(unix)'.dependencies]
+ libc.workspace = true
+ 
+-[target.'cfg(windows)'.dependencies]
+-miow.workspace = true
+-windows-sys = { workspace = true, features = ["Win32_Storage_FileSystem", "Win32_Foundation", "Win32_System_Console"] }
+-
+ [lints]
+ workspace = true
+--- a/src/tools/cargo/crates/home/Cargo.toml
++++ b/src/tools/cargo/crates/home/Cargo.toml
+@@ -17,8 +17,5 @@
+ repository.workspace = true
+ description = "Shared definitions of home directories."
+ 
+-[target.'cfg(windows)'.dependencies]
+-windows-sys = { workspace = true, features = ["Win32_Foundation", "Win32_UI_Shell", "Win32_System_Com"] }
+-
+ [lints]
+ workspace = true
+--- a/src/tools/cargo/credential/cargo-credential/Cargo.toml
++++ b/src/tools/cargo/credential/cargo-credential/Cargo.toml
+@@ -18,9 +18,6 @@
+ [target.'cfg(unix)'.dependencies]
+ libc.workspace = true
+ 
+-[target.'cfg(windows)'.dependencies]
+-windows-sys = { workspace = true, features = ["Win32_System_Console", "Win32_Foundation"] }
+-
+ [dev-dependencies]
+ snapbox = { workspace = true, features = ["examples"] }
+ 
+--- a/src/tools/cargo/src/cargo/util/auth/mod.rs
++++ b/src/tools/cargo/src/cargo/util/auth/mod.rs
+@@ -564,11 +564,6 @@
+             }
+             "cargo:paseto" => bail!("cargo:paseto requires -Zasymmetric-token"),
+             "cargo:token-from-stdout" => Box::new(BasicProcessCredential {}),
+-            #[cfg(windows)]
+-            "cargo:wincred" => Box::new(cargo_credential_wincred::WindowsCredential {}),
+-            #[cfg(target_os = "macos")]
+-            "cargo:macos-keychain" => Box::new(cargo_credential_macos_keychain::MacKeychain {}),
+-            #[cfg(target_os = "linux")]
+             "cargo:libsecret" => Box::new(get_credential_libsecret()?),
+             name if BUILT_IN_PROVIDERS.contains(&name) => {
+                 Box::new(cargo_credential::UnsupportedCredential {})
+--- a/src/tools/compiletest/Cargo.toml
++++ b/src/tools/compiletest/Cargo.toml
+@@ -39,13 +39,3 @@
+ 
+ [target.'cfg(unix)'.dependencies]
+ libc = "0.2"
+-
+-[target.'cfg(windows)'.dependencies]
+-miow = "0.6"
+-
+-[target.'cfg(windows)'.dependencies.windows]
+-version = "0.61.0"
+-features = [
+-    "Win32_Foundation",
+-    "Win32_System_Diagnostics_Debug",
+-]
+--- a/src/tools/rust-analyzer/crates/profile/Cargo.toml
++++ b/src/tools/rust-analyzer/crates/profile/Cargo.toml
+@@ -21,12 +21,6 @@
+ [target.'cfg(all(target_os = "linux", target_env = "gnu"))'.dependencies]
+ libc.workspace = true
+ 
+-[target.'cfg(windows)'.dependencies]
+-windows-sys = { version = "0.60", features = [
+-    "Win32_System_Threading",
+-    "Win32_System_ProcessStatus",
+-] }
+-
+ [features]
+ cpu_profiler = []
+ 
+--- a/src/tools/rust-analyzer/crates/rust-analyzer/Cargo.toml
++++ b/src/tools/rust-analyzer/crates/rust-analyzer/Cargo.toml
+@@ -77,12 +77,6 @@
+ 
+ ra-ap-rustc_type_ir.workspace = true
+ 
+-[target.'cfg(windows)'.dependencies]
+-windows-sys = { version = "0.60", features = [
+-  "Win32_System_Diagnostics_Debug",
+-  "Win32_System_Threading",
+-] }
+-
+ [dev-dependencies]
+ expect-test = "1.5.1"
+ xshell.workspace = true
+--- a/src/tools/rust-analyzer/crates/stdx/Cargo.toml
++++ b/src/tools/rust-analyzer/crates/stdx/Cargo.toml
+@@ -24,10 +24,6 @@
+ [target.'cfg(unix)'.dependencies]
+ libc.workspace = true
+ 
+-[target.'cfg(windows)'.dependencies]
+-miow = "0.6.0"
+-windows-sys = { version = "0.60", features = ["Win32_Foundation"] }
+-
+ [features]
+ # Uncomment to enable for the whole crate graph
+ # default = [ "backtrace" ]
+--- a/library/std/Cargo.toml
++++ b/library/std/Cargo.toml
+@@ -47,61 +47,10 @@
+     'archive',
+ ] }
+ 
+-[target.'cfg(target_os = "aix")'.dependencies]
+-object = { version = "0.37.1", default-features = false, optional = true, features = [
+-    'read_core',
+-    'xcoff',
+-    'unaligned',
+-    'archive',
+-] }
+-
+-[target.'cfg(any(windows, target_os = "cygwin"))'.dependencies.windows-targets]
+-path = "../windows_targets"
+-
+ [dev-dependencies]
+ rand = { version = "0.9.0", default-features = false, features = ["alloc"] }
+ rand_xorshift = "0.4.0"
+ 
+-[target.'cfg(any(all(target_family = "wasm", target_os = "unknown"), target_os = "xous", target_os = "vexos", all(target_vendor = "fortanix", target_env = "sgx")))'.dependencies]
+-dlmalloc = { version = "0.2.10", features = ['rustc-dep-of-std'] }
+-
+-[target.x86_64-fortanix-unknown-sgx.dependencies]
+-fortanix-sgx-abi = { version = "0.6.1", features = [
+-    'rustc-dep-of-std',
+-], public = true }
+-
+-[target.'cfg(target_os = "motor")'.dependencies]
+-moto-rt = { version = "0.15", features = ['rustc-dep-of-std'], public = true }
+-
+-[target.'cfg(target_os = "hermit")'.dependencies]
+-hermit-abi = { version = "0.5.0", features = [
+-    'rustc-dep-of-std',
+-], public = true }
+-
+-[target.'cfg(target_os = "wasi")'.dependencies]
+-wasi = { version = "0.11.0", features = [
+-    'rustc-dep-of-std',
+-], default-features = false }
+-
+-[target.'cfg(all(target_os = "wasi", target_env = "p2"))'.dependencies]
+-wasip2 = { version = '0.14.4', features = [
+-    'rustc-dep-of-std',
+-], default-features = false, package = 'wasi' }
+-
+-[target.'cfg(all(target_os = "wasi", target_env = "p3"))'.dependencies]
+-wasip2 = { version = '0.14.4', features = [
+-    'rustc-dep-of-std',
+-], default-features = false, package = 'wasi' }
+-
+-[target.'cfg(target_os = "uefi")'.dependencies]
+-r-efi = { version = "5.2.0", features = ['rustc-dep-of-std'] }
+-r-efi-alloc = { version = "2.0.0", features = ['rustc-dep-of-std'] }
+-
+-[target.'cfg(target_os = "vexos")'.dependencies]
+-vex-sdk = { version = "0.27.0", features = [
+-    'rustc-dep-of-std',
+-], default-features = false }
+-
+ [features]
+ backtrace = [
+     'addr2line/rustc-dep-of-std',
+@@ -134,7 +83,7 @@
+ 
+ # Enable using raw-dylib for Windows imports.
+ # This will eventually be the default.
+-windows_raw_dylib = ["windows-targets/windows_raw_dylib"]
++windows_raw_dylib = []
+ 
+ [package.metadata.fortanix-sgx]
+ # Maximum possible number of threads when testing
+--- a/library/backtrace/Cargo.toml
++++ b/library/backtrace/Cargo.toml
+@@ -38,9 +38,6 @@
+   "alloc",
+ ] }
+ 
+-[target.'cfg(any(windows, target_os = "cygwin"))'.dependencies]
+-windows-targets = "0.52.6"
+-
+ [target.'cfg(not(all(windows, target_env = "msvc", not(target_vendor = "uwp"))))'.dependencies]
+ miniz_oxide = { version = "0.8", default-features = false }
+ ruzstd = { version = "0.8.1", default-features = false, optional = true }
+--- a/library/backtrace/crates/as-if-std/Cargo.toml
++++ b/library/backtrace/crates/as-if-std/Cargo.toml
+@@ -27,9 +27,6 @@
+ optional = true
+ features = ['read_core', 'elf', 'macho', 'pe', 'xcoff', 'unaligned', 'archive']
+ 
+-[target.'cfg(any(windows, target_os = "cygwin"))'.dependencies]
+-windows-targets = "0.52.6"
+-
+ [features]
+ default = ['backtrace']
+ backtrace = ['addr2line', 'miniz_oxide', 'object', 'ruzstd']
+--- a/library/sysroot/Cargo.toml
++++ b/library/sysroot/Cargo.toml
+@@ -34,5 +34,5 @@
+ profiler = ["dep:profiler_builtins"]
+ std_detect_file_io = ["std/std_detect_file_io"]
+ std_detect_dlsym_getauxval = ["std/std_detect_dlsym_getauxval"]
+-windows_raw_dylib = ["std/windows_raw_dylib"]
++windows_raw_dylib = []
+ llvm_enzyme = ["std/llvm_enzyme"]

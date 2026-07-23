@@ -1,0 +1,35 @@
+#!/bin/bash
+# Test that the `-Z build-std` unstable Cargo feature works,
+# using the vendored standard library dependencies.
+set -euox pipefail
+
+RUST_VERSION=$(dpkg-parsechangelog -SVersion | sed -re 's/([^.]+)\.([^.]+)\..*/\1.\2/')
+RUST_FULL_VERSION=$(dpkg-parsechangelog -SVersion | sed -re 's/([^+]+).*/\1/')
+
+# Set RUSTC so that `cargo` knows which rustc to use
+export RUSTC=/usr/lib/rust-${RUST_VERSION}/bin/rustc
+CARGO=/usr/lib/rust-${RUST_VERSION}/bin/cargo
+
+tmpdir=$(mktemp -d)
+cd "$tmpdir"
+
+${CARGO} new hello
+cd hello
+
+${CARGO} add serde  # add dummy dependency so "cargo vendor" doesn't complain
+${CARGO} vendor --versioned-dirs
+
+# Merge in the standard library dependencies (installed by rust-X.Y-src)
+# into the vendor directory as symlinks:
+ln -s /usr/src/rustc-${RUST_FULL_VERSION}/vendor/* vendor/
+
+mkdir .cargo
+cat <<EOF >.cargo/config.toml
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
+RUSTC_BOOTSTRAP=1 ${CARGO} run -Z build-std --offline 

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+RUST_VERSION=$(dpkg-parsechangelog -SVersion | sed -re 's/([^.]+)\.([^.]+)\..*/\1.\2/')
+BAD_CMD=("cargo-${RUST_VERSION}-unstable-miri" run --bin bad)
+GOOD_CMD=("cargo-${RUST_VERSION}-unstable-miri" run --bin good)
+BAD_EXPECTED=1
+
+EXPECTED_ERR="error: Undefined Behavior"
+
+# Prevent cargo metadata from being confused by workspaces by moving
+# the test deps to their own place
+rm -rf "/tmp/rust-ub-check"
+cp -r "debian/tests/rust-miri-test-deps/rust-ub-check" "/tmp"
+cd "/tmp/rust-ub-check"
+
+# Run the "bad" binary, making sure that miri fails because it detected
+# undefined behaviour
+echo "[MIRI TEST 1] Checking that miri detects undefined behaviour..."
+echo "Running: ${BAD_CMD[*]}"
+set +e
+BAD_OUTPUT=$("${BAD_CMD[@]}" 2>&1)
+# Get exit code of first command in pipe
+BAD_EXIT_CODE=$?
+set -e
+echo "$BAD_OUTPUT"
+
+if [ "$BAD_EXIT_CODE" -eq "$BAD_EXPECTED" ]; then
+    if echo "$BAD_OUTPUT" | grep -Fq "$EXPECTED_ERR"; then
+        echo "[SUCCESS] miri detected undefined behaviour"
+    else
+        echo "[FAILURE] miri failed, but did not detect undefined behaviour"
+        exit 1
+    fi
+else
+    echo "[FAILURE] miri did not return expected exit code ${BAD_EXPECTED} (got ${BAD_EXIT_CODE})"
+    exit 1
+fi
+
+# Run the "good" binary, ensuring that miri accepts it
+echo "[MIRI TEST 2] Checking that miri accepts valid code..."
+echo "Running: ${GOOD_CMD[*]}"
+"${GOOD_CMD[@]}"
+echo "[SUCCESS] miri accepts valid code"
+
+echo "[MIRI TESTS OK] All rust-miri tests passed."

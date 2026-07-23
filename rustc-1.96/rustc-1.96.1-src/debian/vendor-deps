@@ -1,0 +1,138 @@
+#!/bin/bash
+# This script generates the filtered vendored dependencies of this toolchain.
+#
+# This script requires an up-to-date Rust toolchain with cargo-vendor-filterer
+# installed; see https://crates.io/crates/cargo-vendor-filterer/ for more info.
+#
+# It is typically invoked by d/rules vendor-deps.
+#
+# Manual invocation example for 1.89:
+# RUST_BOOTSTRAP_DIR=~/.rustup/toolchains/1.89.0-x86_64-unknown-linux-gnu/ debian/vendor-deps ./filtered-vendor
+
+set -e
+
+function cleanup() {
+    set +e
+
+    cd "$scriptdir"
+
+    # Restore the lockfiles of the given manifests
+    git restore "Cargo.lock"
+    for manifest in ${project_manifests[@]}; do
+        if [ -f "${manifest::-4}lock" ]; then
+            git restore "${manifest::-4}lock"
+        fi
+    done
+
+    rm -rf "$scriptdir/debian/cargo"
+
+    rm -f "$scriptdir/debian/copyright.unused-deps"
+
+    if [ -f "$std_manifest_backup" ]; then
+        mv "$std_manifest_backup" "$std_manifest"
+    fi
+
+    quilt pop -a >/dev/null 2>&1
+
+    rm -rf "$scriptdir/.pc"
+}
+trap cleanup EXIT
+
+# List of supported platforms; edit as needed
+supported_platforms=(
+    "x86_64-unknown-linux-gnu"
+    "aarch64-unknown-linux-gnu"
+    "i686-unknown-linux-gnu"
+    "armv7-unknown-linux-gnueabihf"
+    "powerpc64le-unknown-linux-gnu"
+    "powerpc-unknown-linux-gnu"
+    "s390x-unknown-linux-gnu"
+    "riscv64gc-unknown-linux-gnu"
+    "riscv64a23-unknown-linux-gnu"
+)
+
+# Consult the hard-coded list of workspaces to vendor in
+# src/bootstrap/src/core/build_steps/vendor.rs, then comment out any
+# that aren't used by this package
+project_manifests=(
+    "src/tools/cargo/Cargo.toml"         # cargo
+    "src/tools/rust-analyzer/Cargo.toml" # rust-analyzer
+    # "compiler/rustc_codegen_cranelift/Cargo.toml" # cranelift codegen
+    # "compiler/rustc_codegen_gcc/Cargo.toml" # GCC codegen
+    "library/Cargo.toml"            # libraries
+    "src/bootstrap/Cargo.toml"      # bootstrap
+    "src/tools/rustbook/Cargo.toml" # rustbook
+    "src/tools/clippy/clippy_test_deps/Cargo.toml" # clippy test dependencies
+    # "src/tools/rustc-perf/Cargo.toml" # rustc performance graph
+    # "src/tools/opt-dist/Cargo.toml"         # PGO and BOLT optimizer
+    # "src/doc/book/packages/trpl/Cargo.toml" # The Rust Programming Language
+)
+
+# Certain dependencies in the standard library manifest
+# (library/std/Cargo.toml) are marked as optional, but are actually
+# required by the backtrace crate.
+#
+# They aren't normally picked up by cargo-vendor-filterer, so they must
+# be temporarily marked as non-optional while running
+# cargo-vendor-filterer. The standard library manifest itself is not
+# impacted in any way for the rest of the build process.
+forced_std_deps=(
+    "miniz_oxide"
+    "addr2line"
+    "object"
+)
+
+scriptdir=$(dirname "$(dirname "$(readlink -f "$0")")")
+
+# Get output dir
+if [ $# -ne 1 ]; then
+    echo "usage: $0 <output dir>" >&2
+    exit 1
+fi
+vendored_deps="$1"
+if [ -d "$vendored_deps" ]; then
+    echo "directory $vendored_deps already exists" >&2
+    exit 1
+fi
+
+quilt push -a
+
+vendor_filterer_args=()
+for platform in "${supported_platforms[@]}"; do
+    vendor_filterer_args+=("--platform=$platform")
+done
+for manifest in "${project_manifests[@]}"; do
+    vendor_filterer_args+=("--sync=$manifest")
+done
+
+# Temporarily force-include backtrace dependencies
+std_manifest="$scriptdir/library/std/Cargo.toml"
+std_manifest_backup="$std_manifest.backup"
+
+cp "$std_manifest" "$std_manifest_backup"
+
+function std_dep_make_non_optional() {
+    local crate=$1
+
+    if ! grep -q "$crate = {.*optional = true.*" "$std_manifest"; then
+        echo "optional dependency $crate not found in $std_manifest" >&2
+        exit 1
+    fi
+
+    sed -i \
+        "s/\($crate = {.*\)optional = true\(.*\)/\1optional = false\2/" \
+        "$std_manifest"
+}
+
+for forced_std_dep in "${forced_std_deps[@]}"; do
+    std_dep_make_non_optional "$forced_std_dep"
+done
+
+RUSTC_BOOTSTRAP=1 ${RUST_BOOTSTRAP_DIR}/bin/cargo vendor-filterer "$vendored_deps" \
+    --versioned-dirs \
+    "${vendor_filterer_args[@]}"
+
+# Restore the actual std manifest
+mv "$std_manifest_backup" "$std_manifest"
+
+echo "successfully created filtered vendored dependencies in $vendored_deps"

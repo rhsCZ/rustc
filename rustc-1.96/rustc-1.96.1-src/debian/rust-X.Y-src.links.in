@@ -1,0 +1,2 @@
+usr/src/rustc-${env:RUST_LONG_VERSION} usr/lib/rust-${env:RUST_VERSION}/rustlib/src/rust
+usr/src/rustc-${env:RUST_LONG_VERSION} usr/lib/rust-${env:RUST_VERSION}/lib/rustlib/src/rust

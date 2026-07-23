@@ -1,0 +1,26 @@
+#!/bin/bash
+set -Eeuo pipefail
+
+RUST_VERSION=$(dpkg-parsechangelog -SVersion | sed -re 's/([^.]+)\.([^.]+)\..*/\1.\2/')
+
+# Set RUSTC so that `cargo` knows which rustc to use
+export RUSTC=/usr/lib/rust-${RUST_VERSION}/bin/rustc
+CARGO=/usr/lib/rust-${RUST_VERSION}/bin/cargo
+
+cd debian/tests/git-repo-test-deps
+
+# Copy dependent-git-repo to an absolute path /tmp/dependent-git-repo,
+# because Cargo does not support relative paths for local git dependencies.
+rm -rf /tmp/dependent-git-repo
+cp -r dependent-git-repo /tmp
+
+# Create a git repository:
+pushd /tmp/dependent-git-repo
+git init
+git add Cargo.toml src
+git commit -m "Initial commit"
+popd
+
+# Validate that the crate builds and runs
+cd crate-with-git-dependency
+${CARGO} run

@@ -1,0 +1,111 @@
+Description: Skip root-sensitive and packaging-specific tests
+ Several upstream tests assume a non-root environment or a specific rustdoc
+ doctest persistence failure mode. Those assumptions do not hold on Ubuntu
+ buildds or in the packaged test environment, so skip them there.
+Author: OpenAI Codex
+Forwarded: not-needed
+Last-Update: 2026-07-19
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/src/tools/rust-installer/test.sh
++++ b/src/tools/rust-installer/test.sh
+@@ -986,6 +986,11 @@
+ cannot_write_error() {
+     # chmod doesn't work on windows
+     if [ ! -n "${WINDOWS-}" ]; then
++    # Ubuntu: buildds run as root, so making PREFIX_DIR readonly does not
++    # reliably make the installer fail.
++    if [ "$(id -u)" -eq 0 ]; then
++        return
++    fi
+     try sh "$S/gen-installer.sh" \
+         --image-dir="$TEST_DIR/image1" \
+         --work-dir="$WORK_DIR" \
+--- a/tests/rustdoc-ui/issues/issue-98690.rs
++++ b/tests/rustdoc-ui/issues/issue-98690.rs
+@@ -1,6 +1,9 @@
+ //@ compile-flags: --test --persist-doctests /../../ -Z unstable-options
+ //@ failure-status: 101
+ //@ only-linux
++//@ ignore-test
++// Ubuntu: doctest persistence paths in the packaged test environment do not
++// reproduce the original permission-denied failure expected by this test.
+ 
+ #![crate_name = "foo"]
+ 
+--- a/tests/run-make/inaccessible-temp-dir/rmake.rs
++++ b/tests/run-make/inaccessible-temp-dir/rmake.rs
+@@ -24,9 +24,15 @@
+ // Reason: `set_readonly` has no effect on directories
+ // and does not prevent modification.
+ 
+-use run_make_support::{rfs, rustc, test_while_readonly};
++use run_make_support::{libc, rfs, rustc, test_while_readonly};
+ 
+ fn main() {
++    // Ubuntu: buildds run as root, so the readonly-directory setup below does
++    // not reliably trigger a permission failure.
++    if unsafe { libc::getuid() } == 0 {
++        return;
++    }
++
+     // Create an inaccessible directory.
+     rfs::create_dir("inaccessible");
+     test_while_readonly("inaccessible", || {
+--- a/tests/run-make/incremental-finalize-fail/rmake.rs
++++ b/tests/run-make/incremental-finalize-fail/rmake.rs
+@@ -19,13 +19,19 @@
+ use std::fs;
+ use std::path::{Path, PathBuf};
+ 
+-use run_make_support::rustc;
++use run_make_support::{libc, rustc};
+ 
+ /// Guard that restores permissions on the incremental directory on drop,
+ /// to ensure cleanup is possible
+ struct IncrDirCleanup;
+ 
+ fn main() {
++    // Ubuntu: buildds run as root, so removing write permission from the
++    // incremental directory does not reliably make finalization fail.
++    if unsafe { libc::getuid() } == 0 {
++        return;
++    }
++
+     let _cleanup = IncrDirCleanup;
+ 
+     // Build the poison proc-macro crate
+--- a/tests/run-make/libtest-thread-limit/rmake.rs
++++ b/tests/run-make/libtest-thread-limit/rmake.rs
+@@ -18,6 +18,12 @@
+ use run_make_support::{libc, rustc};
+ 
+ fn main() {
++    // Ubuntu: buildds run as root, and RLIMIT_NPROC does not reliably prevent
++    // thread creation for uid 0.
++    if unsafe { libc::getuid() } == 0 {
++        return;
++    }
++
+     rustc().input("test.rs").arg("--test").run();
+ 
+     // We need to emulate an environment for libtest where threads are exhausted and spawning
+--- a/tests/run-make/rustdoc-io-error/rmake.rs
++++ b/tests/run-make/rustdoc-io-error/rmake.rs
+@@ -15,9 +15,15 @@
+ //@ ignore-windows - the `set_readonly` functions doesn't work on folders.
+ //@ needs-target-std
+ 
+-use run_make_support::{path, rfs, rustdoc};
++use run_make_support::{libc, path, rfs, rustdoc};
+ 
+ fn main() {
++    // Ubuntu: buildds run as root, so a readonly output directory does not
++    // reliably trigger the intended rustdoc permission error.
++    if unsafe { libc::getuid() } == 0 {
++        return;
++    }
++
+     let out_dir = path("rustdoc-io-error");
+     rfs::create_dir(&out_dir);
+     let mut permissions = rfs::metadata(&out_dir).permissions();
