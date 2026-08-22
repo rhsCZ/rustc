@@ -1,0 +1,38 @@
+Description: Accept Ubuntu libgit2 1.9.1 for libgit2-sys
+ The vendored libgit2 sources are pruned from the repacked vendor tarball,
+ so falling back to the bundled copy is not possible in offline builds.
+ Accept the system libgit2 shipped by Ubuntu instead.
+Author: Codex <codex@local>
+Origin: ubuntu
+Forwarded: not-needed
+Last-Update: 2026-08-21
+---
+This patch header follows DEP-3: http://dep.debian.net/deps/dep3/
+--- a/vendor/libgit2-sys-0.18.2+1.9.1/build.rs
++++ b/vendor/libgit2-sys-0.18.2+1.9.1/build.rs
+@@ -7,7 +7,10 @@ use std::process::Command;
+ /// Tries to use system libgit2 and emits necessary build script instructions.
+ fn try_system_libgit2() -> Result<pkg_config::Library, pkg_config::Error> {
+     let mut cfg = pkg_config::Config::new();
+-    match cfg.range_version("1.9.0".."1.10.0").probe("libgit2") {
++    // The repacked source omits the bundled libgit2 sources, so offline
++    // package builds must use the system library instead of attempting the
++    // vendored fallback. Accept Ubuntu's libgit2 1.9.1 packaging.
++    match cfg.range_version("1.9.1".."1.10.0").probe("libgit2") {
+         Ok(lib) => {
+             for include in &lib.include_paths {
+                 println!("cargo:root={}", include.display());
+--- a/vendor/libgit2-sys-0.18.5+1.9.4/build.rs
++++ b/vendor/libgit2-sys-0.18.5+1.9.4/build.rs
+@@ -9,7 +9,10 @@
+     experimental_sha256: bool,
+ ) -> Result<pkg_config::Library, Box<dyn std::error::Error>> {
+     let mut cfg = pkg_config::Config::new();
+-    let range_version = "1.9.4".."1.10.0";
++    // The repacked source omits the bundled libgit2 sources, so offline
++    // package builds must use the system library instead of attempting the
++    // vendored fallback. Accept Ubuntu's libgit2 1.9.1 packaging.
++    let range_version = "1.9.1".."1.10.0";
+ 
+     let lib = if experimental_sha256 {
+         // Determine whether experimental SHA256 object support is enabled.

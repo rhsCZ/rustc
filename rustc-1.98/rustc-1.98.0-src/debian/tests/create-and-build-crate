@@ -1,0 +1,45 @@
+#!/bin/bash
+set -euox pipefail
+
+RUST_VERSION=$(dpkg-parsechangelog -SVersion | sed -re 's/([^.]+)\.([^.]+)\..*/\1.\2/')
+
+# Set RUSTC so that `cargo` knows which rustc to use
+export RUSTC=/usr/lib/rust-${RUST_VERSION}/bin/rustc
+CARGO=/usr/lib/rust-${RUST_VERSION}/bin/cargo
+
+tmpdir=$(mktemp -d)
+cd "$tmpdir"
+
+${CARGO} new hello
+cd hello
+
+cat <<EOF > src/main.rs
+use anyhow::Result;
+
+fn main() -> Result<()> {
+    println!("Hello, World!");
+    Ok(())
+}
+
+#[test]
+fn test() {
+    assert_eq!(1 + 1, 2);
+}
+EOF
+
+${CARGO} add 'anyhow@^1'
+${CARGO} vendor
+
+mkdir -p .cargo
+cat <<EOF > .cargo/config.toml
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
+${CARGO} check
+${CARGO} build
+${CARGO} test
+${CARGO} run

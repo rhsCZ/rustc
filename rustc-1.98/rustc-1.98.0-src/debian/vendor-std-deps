@@ -1,0 +1,41 @@
+#!/bin/bash
+# Vendor the standard library dependencies. Currently this is needed
+# in order to support use of the unstable "-Z build-std" rustc feature in offline
+# environments. Once the feature is stabilized it should become no longer necessary 
+# (pending resolution of https://github.com/rust-lang/wg-cargo-std-aware/issues/23
+# and related issues).
+
+std_vendored_deps="$1"
+if [ -d "$std_vendored_deps" ]; then
+    echo "directory $std_vendored_deps already exists" >&2
+    exit 1
+fi
+
+# List of supported platforms; edit as needed
+supported_platforms=(
+    "x86_64-unknown-linux-gnu"
+    "aarch64-unknown-linux-gnu"
+    "i686-unknown-linux-gnu"
+    "armv7-unknown-linux-gnueabihf"
+    "powerpc64le-unknown-linux-gnu"
+    "powerpc-unknown-linux-gnu"
+    "s390x-unknown-linux-gnu"
+    "riscv64gc-unknown-linux-gnu"
+    "riscv64a23-unknown-linux-gnu"
+)
+
+vendor_filterer_args=()
+for platform in "${supported_platforms[@]}"; do
+    vendor_filterer_args+=("--platform=$platform")
+done
+
+quilt push -a
+
+echo "Vendoring standard library dependencies to ${std_vendored_deps}..."
+RUSTC_BOOTSTRAP=1 ${RUST_BOOTSTRAP_DIR}/bin/cargo vendor-filterer \
+  --manifest-path library/Cargo.toml \
+  --versioned-dirs \
+  "${vendor_filterer_args[@]}" \
+  ${std_vendored_deps}
+
+quilt pop -a

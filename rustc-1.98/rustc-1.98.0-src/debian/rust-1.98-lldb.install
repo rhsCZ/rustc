@@ -1,0 +1,3 @@
+usr/lib/rust-${env:RUST_VERSION}/bin/rust-lldb
+usr/lib/rust-${env:RUST_VERSION}/lib/rustlib/etc/lldb_lookup.py
+usr/lib/rust-${env:RUST_VERSION}/lib/rustlib/etc/lldb_providers.py

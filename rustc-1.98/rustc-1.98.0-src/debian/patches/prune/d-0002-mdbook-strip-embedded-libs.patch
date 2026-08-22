@@ -1,0 +1,463 @@
+From: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+Date: Sat, 2 Oct 2021 01:08:00 +0100
+Subject: d-0002-mdbook-strip-embedded-libs
+
+Description: Use https://github.com/infinity0/mdBook/tree/debian to help you rebase
+the patch on top of a newer version. . Make sure the paths here match the ones
+in debian/rust-doc.links
+
+Forwarded: not-needed
+---
+ src/doc/rust-by-example/theme/index.hbs            |  86 +----------------
+ src/tools/linkchecker/main.rs                      |  28 +++++-
+ vendor/mdbook-0.4.43/src/book/init.rs              |  19 ----
+ .../src/renderer/html_handlebars/hbs_renderer.rs   | 104 ++++-----------------
+ .../src/renderer/html_handlebars/search.rs         |   2 -
+ vendor/mdbook-0.4.43/src/theme/index.hbs           |  86 +----------------
+ vendor/mdbook-0.4.43/src/theme/mod.rs              |  27 ------
+ vendor/mdbook-0.4.43/src/theme/searcher/mod.rs     |   2 -
+ 8 files changed, 51 insertions(+), 303 deletions(-)
+
+--- a/src/tools/linkchecker/main.rs
++++ b/src/tools/linkchecker/main.rs
+@@ -194,7 +194,17 @@
+         for entry in t!(dir.read_dir()).map(|e| t!(e)) {
+             let path = entry.path();
+             // Goes through symlinks
+-            let metadata = t!(fs::metadata(&path));
++            let metadata = fs::metadata(&path);
++            if let Err(err) = metadata {
++                if let Ok(target) = fs::read_link(&path) {
++                    if target.starts_with("/usr/share") {
++                        // broken symlink to /usr/share, ok for our Debian build
++                        return;
++                    }
++                }
++                panic!("error at file {:?} while walking - {:?}", path, err)
++            }
++            let metadata = t!(metadata);
+             if metadata.is_dir() {
+                 self.walk(&path, report);
+             } else {
+@@ -207,7 +217,15 @@
+     fn check(&mut self, file: &Path, report: &mut Report) {
+         let (pretty_path, entry) = self.load_file(file, report);
+         let source = match entry {
+-            FileEntry::Missing => panic!("missing file {:?} while walking", file),
++            FileEntry::Missing => {
++                if let Ok(target) = fs::read_link(&file) {
++                    if target.starts_with("/usr/share") {
++                        // broken symlink to /usr/share, ok for our Debian build
++                        return;
++                    }
++                }
++                panic!("missing file {:?} while walking", file)
++            }
+             FileEntry::Dir => unreachable!("never with `check` path"),
+             FileEntry::OtherFile => return,
+             FileEntry::Redirect { .. } => return,
+@@ -296,6 +314,12 @@
+         let (target_pretty_path, target_entry) = self.load_file(&path, report);
+         let (target_source, target_ids) = match target_entry {
+             FileEntry::Missing => {
++                if let Ok(target) = fs::read_link(&path) {
++                    if target.starts_with("/usr/share") {
++                        // broken symlink to /usr/share, ok for our Debian build
++                        return;
++                    }
++                }
+                 if is_exception(file, &target_pretty_path) {
+                     report.links_ignored_exception += 1;
+                 } else {
+--- a/vendor/mdbook-0.4.52/src/book/init.rs
++++ b/vendor/mdbook-0.4.52/src/book/init.rs
+@@ -153,25 +153,6 @@
+         let mut js = File::create(themedir.join("book.js"))?;
+         js.write_all(theme::JS)?;
+ 
+-        let mut highlight_css = File::create(themedir.join("highlight.css"))?;
+-        highlight_css.write_all(theme::HIGHLIGHT_CSS)?;
+-
+-        let mut highlight_js = File::create(themedir.join("highlight.js"))?;
+-        highlight_js.write_all(theme::HIGHLIGHT_JS)?;
+-
+-        write_file(&themedir.join("fonts"), "fonts.css", theme::fonts::CSS)?;
+-        for (file_name, contents) in theme::fonts::LICENSES {
+-            write_file(&themedir, file_name, contents)?;
+-        }
+-        for (file_name, contents) in theme::fonts::OPEN_SANS.iter() {
+-            write_file(&themedir, file_name, contents)?;
+-        }
+-        write_file(
+-            &themedir,
+-            theme::fonts::SOURCE_CODE_PRO.0,
+-            theme::fonts::SOURCE_CODE_PRO.1,
+-        )?;
+-
+         Ok(())
+     }
+ 
+--- a/vendor/mdbook-0.4.52/src/renderer/html_handlebars/search.rs
++++ b/vendor/mdbook-0.4.52/src/renderer/html_handlebars/search.rs
+@@ -75,8 +75,6 @@
+             .as_bytes(),
+         );
+         static_files.add_builtin("searcher.js", searcher::JS);
+-        static_files.add_builtin("mark.min.js", searcher::MARK_JS);
+-        static_files.add_builtin("elasticlunr.min.js", searcher::ELASTICLUNR_JS);
+         debug!("Copying search files ✓");
+     }
+ 
+--- a/vendor/mdbook-0.4.52/src/renderer/html_handlebars/static_files.rs
++++ b/vendor/mdbook-0.4.52/src/renderer/html_handlebars/static_files.rs
+@@ -5,12 +5,13 @@
+ use crate::config::HtmlConfig;
+ use crate::errors::*;
+ use crate::renderer::html_handlebars::helpers::resources::ResourceHelper;
+-use crate::theme::{self, playground_editor, Theme};
++use crate::theme::{self, Theme};
+ use crate::utils;
+ 
+ use std::borrow::Cow;
+ use std::collections::HashMap;
+ use std::fs::{self, File};
++use std::os::unix::fs::symlink;
+ use std::path::{Path, PathBuf};
+ use std::sync::LazyLock;
+ 
+@@ -59,72 +60,8 @@
+         if let Some(contents) = &theme.favicon_svg {
+             this.add_builtin("favicon.svg", contents);
+         }
+-        this.add_builtin("highlight.css", &theme.highlight_css);
+         this.add_builtin("tomorrow-night.css", &theme.tomorrow_night_css);
+         this.add_builtin("ayu-highlight.css", &theme.ayu_highlight_css);
+-        this.add_builtin("highlight.js", &theme.highlight_js);
+-        this.add_builtin("clipboard.min.js", &theme.clipboard_js);
+-        this.add_builtin("FontAwesome/css/font-awesome.css", theme::FONT_AWESOME);
+-        this.add_builtin(
+-            "FontAwesome/fonts/fontawesome-webfont.eot",
+-            theme::FONT_AWESOME_EOT,
+-        );
+-        this.add_builtin(
+-            "FontAwesome/fonts/fontawesome-webfont.svg",
+-            theme::FONT_AWESOME_SVG,
+-        );
+-        this.add_builtin(
+-            "FontAwesome/fonts/fontawesome-webfont.ttf",
+-            theme::FONT_AWESOME_TTF,
+-        );
+-        this.add_builtin(
+-            "FontAwesome/fonts/fontawesome-webfont.woff",
+-            theme::FONT_AWESOME_WOFF,
+-        );
+-        this.add_builtin(
+-            "FontAwesome/fonts/fontawesome-webfont.woff2",
+-            theme::FONT_AWESOME_WOFF2,
+-        );
+-        this.add_builtin("FontAwesome/fonts/FontAwesome.ttf", theme::FONT_AWESOME_TTF);
+-        if html_config.copy_fonts && theme.fonts_css.is_none() {
+-            this.add_builtin("fonts/fonts.css", theme::fonts::CSS);
+-            for (file_name, contents) in theme::fonts::LICENSES.iter() {
+-                this.add_builtin(file_name, contents);
+-            }
+-            for (file_name, contents) in theme::fonts::OPEN_SANS.iter() {
+-                this.add_builtin(file_name, contents);
+-            }
+-            this.add_builtin(
+-                theme::fonts::SOURCE_CODE_PRO.0,
+-                theme::fonts::SOURCE_CODE_PRO.1,
+-            );
+-        } else if let Some(fonts_css) = &theme.fonts_css {
+-            if !fonts_css.is_empty() {
+-                this.add_builtin("fonts/fonts.css", fonts_css);
+-            }
+-        }
+-        if !html_config.copy_fonts && theme.fonts_css.is_none() {
+-            warn!(
+-                "output.html.copy-fonts is deprecated.\n\
+-                This book appears to have copy-fonts=false in book.toml without a fonts.css file.\n\
+-                Add an empty `theme/fonts/fonts.css` file to squelch this warning."
+-            );
+-        }
+-
+-        let playground_config = &html_config.playground;
+-
+-        // Ace is a very large dependency, so only load it when requested
+-        if playground_config.editable && playground_config.copy_js {
+-            // Load the editor
+-            this.add_builtin("editor.js", playground_editor::JS);
+-            this.add_builtin("ace.js", playground_editor::ACE_JS);
+-            this.add_builtin("mode-rust.js", playground_editor::MODE_RUST_JS);
+-            this.add_builtin("theme-dawn.js", playground_editor::THEME_DAWN_JS);
+-            this.add_builtin(
+-                "theme-tomorrow_night.js",
+-                playground_editor::THEME_TOMORROW_NIGHT_JS,
+-            );
+-        }
+ 
+         let custom_files = html_config
+             .additional_css
+@@ -143,18 +80,6 @@
+             });
+         }
+ 
+-        for input_location in theme.font_files.iter().cloned() {
+-            let filename = Path::new("fonts")
+-                .join(input_location.file_name().unwrap())
+-                .to_str()
+-                .with_context(|| "resource file names must be valid utf8")?
+-                .to_owned();
+-            this.static_files.push(StaticFile::Additional {
+-                input_location,
+-                filename,
+-            });
+-        }
+-
+         Ok(this)
+     }
+ 
+@@ -292,6 +217,29 @@
+                 }
+             }
+         }
++
++        // Manually symlink files from stripped embedded libs
++        symlink(
++            "/usr/share/fonts-font-awesome/css/font-awesome.min.css",
++            destination.join("css/font-awesome.min.css"),
++        )?;
++        symlink(
++            "/usr/share/fonts-font-awesome/fonts",
++            destination.join("fonts"),
++        )?;
++        symlink(
++            "/usr/share/javascript/highlight.js/styles/atelier-dune-light.css",
++            destination.join("highlight.css"),
++        )?;
++        symlink(
++            "/usr/share/javascript/highlight.js/highlight.js",
++            destination.join("highlight.js"),
++        )?;
++        symlink(
++            "/usr/share/javascript/mathjax/MathJax.js",
++            destination.join("MathJax.js"),
++        )?;
++
+         let hash_map = self.hash_map;
+         Ok(ResourceHelper { hash_map })
+     }
+--- a/vendor/mdbook-0.4.52/src/front-end/mod.rs
++++ b/vendor/mdbook-0.4.52/src/front-end/mod.rs
+@@ -1,9 +1,5 @@
+ #![allow(missing_docs)]
+ 
+-pub mod playground_editor;
+-
+-pub mod fonts;
+-
+ #[cfg(feature = "search")]
+ pub mod searcher;
+ 
+@@ -26,18 +22,8 @@
+ pub static FAVICON_PNG: &[u8] = include_bytes!("images/favicon.png");
+ pub static FAVICON_SVG: &[u8] = include_bytes!("images/favicon.svg");
+ pub static JS: &[u8] = include_bytes!("js/book.js");
+-pub static HIGHLIGHT_JS: &[u8] = include_bytes!("js/highlight.js");
+ pub static TOMORROW_NIGHT_CSS: &[u8] = include_bytes!("css/tomorrow-night.css");
+-pub static HIGHLIGHT_CSS: &[u8] = include_bytes!("css/highlight.css");
+ pub static AYU_HIGHLIGHT_CSS: &[u8] = include_bytes!("css/ayu-highlight.css");
+-pub static CLIPBOARD_JS: &[u8] = include_bytes!("js/clipboard.min.js");
+-pub static FONT_AWESOME: &[u8] = include_bytes!("css/font-awesome.min.css");
+-pub static FONT_AWESOME_EOT: &[u8] = include_bytes!("fonts/fontawesome-webfont.eot");
+-pub static FONT_AWESOME_SVG: &[u8] = include_bytes!("fonts/fontawesome-webfont.svg");
+-pub static FONT_AWESOME_TTF: &[u8] = include_bytes!("fonts/fontawesome-webfont.ttf");
+-pub static FONT_AWESOME_WOFF: &[u8] = include_bytes!("fonts/fontawesome-webfont.woff");
+-pub static FONT_AWESOME_WOFF2: &[u8] = include_bytes!("fonts/fontawesome-webfont.woff2");
+-pub static FONT_AWESOME_OTF: &[u8] = include_bytes!("fonts/FontAwesome.otf");
+ 
+ /// The `Theme` struct should be used instead of the static variables because
+ /// the `new()` method will look if the user has a theme directory in their
+@@ -62,11 +48,8 @@
+     pub favicon_png: Option<Vec<u8>>,
+     pub favicon_svg: Option<Vec<u8>>,
+     pub js: Vec<u8>,
+-    pub highlight_css: Vec<u8>,
+     pub tomorrow_night_css: Vec<u8>,
+     pub ayu_highlight_css: Vec<u8>,
+-    pub highlight_js: Vec<u8>,
+-    pub clipboard_js: Vec<u8>,
+ }
+ 
+ impl Theme {
+@@ -98,9 +81,6 @@
+                     theme_dir.join("css/variables.css"),
+                     &mut theme.variables_css,
+                 ),
+-                (theme_dir.join("highlight.js"), &mut theme.highlight_js),
+-                (theme_dir.join("clipboard.min.js"), &mut theme.clipboard_js),
+-                (theme_dir.join("highlight.css"), &mut theme.highlight_css),
+                 (
+                     theme_dir.join("tomorrow-night.css"),
+                     &mut theme.tomorrow_night_css,
+@@ -190,11 +170,8 @@
+             favicon_png: Some(FAVICON_PNG.to_owned()),
+             favicon_svg: Some(FAVICON_SVG.to_owned()),
+             js: JS.to_owned(),
+-            highlight_css: HIGHLIGHT_CSS.to_owned(),
+             tomorrow_night_css: TOMORROW_NIGHT_CSS.to_owned(),
+             ayu_highlight_css: AYU_HIGHLIGHT_CSS.to_owned(),
+-            highlight_js: HIGHLIGHT_JS.to_owned(),
+-            clipboard_js: CLIPBOARD_JS.to_owned(),
+         }
+     }
+ }
+@@ -283,11 +260,8 @@
+             favicon_png: Some(Vec::new()),
+             favicon_svg: Some(Vec::new()),
+             js: Vec::new(),
+-            highlight_css: Vec::new(),
+             tomorrow_night_css: Vec::new(),
+             ayu_highlight_css: Vec::new(),
+-            highlight_js: Vec::new(),
+-            clipboard_js: Vec::new(),
+         };
+ 
+         assert_eq!(got, empty);
+--- a/vendor/mdbook-0.4.52/src/front-end/searcher/mod.rs
++++ b/vendor/mdbook-0.4.52/src/front-end/searcher/mod.rs
+@@ -2,5 +2,3 @@
+ //! the "search" cargo feature is disabled.
+ 
+ pub static JS: &[u8] = include_bytes!("searcher.js");
+-pub static MARK_JS: &[u8] = include_bytes!("mark.min.js");
+-pub static ELASTICLUNR_JS: &[u8] = include_bytes!("elasticlunr.min.js");
+--- a/vendor/mdbook-0.4.52/src/front-end/templates/index.hbs
++++ b/vendor/mdbook-0.4.52/src/front-end/templates/index.hbs
+@@ -33,10 +33,7 @@
+         {{/if}}
+ 
+         <!-- Fonts -->
+-        <link rel="stylesheet" href="{{ resource "FontAwesome/css/font-awesome.css" }}">
+-        {{#if copy_fonts}}
+-        <link rel="stylesheet" href="{{ resource "fonts/fonts.css" }}">
+-        {{/if}}
++        <link rel="stylesheet" href="{{ path_to_root }}css/font-awesome.min.css">
+ 
+         <!-- Highlight.js Stylesheets -->
+         <link rel="stylesheet" id="highlight-css" href="{{ resource "highlight.css" }}">
+@@ -50,7 +47,7 @@
+ 
+         {{#if mathjax_support}}
+         <!-- MathJax -->
+-        <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
++        <script async src="MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+         {{/if}}
+ 
+         <!-- Provide site root and default themes to javascript -->
+@@ -77,34 +74,6 @@
+         </div>
+     </div>
+     <div id="body-container">
+-        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+-        <script>
+-            try {
+-                let theme = localStorage.getItem('mdbook-theme');
+-                let sidebar = localStorage.getItem('mdbook-sidebar');
+-
+-                if (theme.startsWith('"') && theme.endsWith('"')) {
+-                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+-                }
+-
+-                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+-                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+-                }
+-            } catch (e) { }
+-        </script>
+-
+-        <!-- Set the theme before any content is loaded, prevents flash -->
+-        <script>
+-            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+-            let theme;
+-            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+-            if (theme === null || theme === undefined) { theme = default_theme; }
+-            const html = document.documentElement;
+-            html.classList.remove('{{ default_theme }}')
+-            html.classList.add(theme);
+-            html.classList.add("js");
+-        </script>
+-
+         <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+ 
+         <!-- Hide / unhide sidebar before it is displayed -->
+@@ -264,54 +233,8 @@
+         </script>
+         {{/if}}
+ 
+-        {{#if google_analytics}}
+-        <!-- Google Analytics Tag -->
+-        <script>
+-            const localAddrs = ["localhost", "127.0.0.1", ""];
+-
+-            // make sure we don't activate google analytics if the developer is
+-            // inspecting the book locally...
+-            if (localAddrs.indexOf(document.location.hostname) === -1) {
+-                (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+-                })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+-
+-                ga('create', '{{google_analytics}}', 'auto');
+-                ga('send', 'pageview');
+-            }
+-        </script>
+-        {{/if}}
+-
+-        {{#if playground_line_numbers}}
+-        <script>
+-            window.playground_line_numbers = true;
+-        </script>
+-        {{/if}}
+-
+-        {{#if playground_copyable}}
+-        <script>
+-            window.playground_copyable = true;
+-        </script>
+-        {{/if}}
+-
+-        {{#if playground_js}}
+-        <script src="{{ resource "ace.js" }}"></script>
+-        <script src="{{ resource "mode-rust.js" }}"></script>
+-        <script src="{{ resource "editor.js" }}"></script>
+-        <script src="{{ resource "theme-dawn.js" }}"></script>
+-        <script src="{{ resource "theme-tomorrow_night.js" }}"></script>
+-        {{/if}}
+-
+-        {{#if search_js}}
+-        <script src="{{ resource "elasticlunr.min.js" }}"></script>
+-        <script src="{{ resource "mark.min.js" }}"></script>
+-        <script src="{{ resource "searcher.js" }}"></script>
+-        {{/if}}
+-
+-        <script src="{{ resource "clipboard.min.js" }}"></script>
+-        <script src="{{ resource "highlight.js" }}"></script>
+-        <script src="{{ resource "book.js" }}"></script>
++        <script src="{{ path_to_root }}highlight.js" type="text/javascript" charset="utf-8"></script>
++        <script src="{{ path_to_root }}book.js" type="text/javascript" charset="utf-8"></script>
+ 
+         <!-- Custom JS scripts -->
+         {{#each additional_js}}
+--- a/vendor/mdbook-0.4.52/src/front-end/templates/toc.html.hbs
++++ b/vendor/mdbook-0.4.52/src/front-end/templates/toc.html.hbs
+@@ -28,10 +28,7 @@
+         <link rel="stylesheet" href="{{ resource "css/print.css" }}" media="print">
+         {{/if}}
+         <!-- Fonts -->
+-        <link rel="stylesheet" href="{{ resource "FontAwesome/css/font-awesome.css" }}">
+-        {{#if copy_fonts}}
+-        <link rel="stylesheet" href="{{ resource "fonts/fonts.css" }}">
+-        {{/if}}
++        <link rel="stylesheet" href="{{ path_to_root }}css/font-awesome.min.css">
+         <!-- Custom theme stylesheets -->
+         {{#each additional_css}}
+         <link rel="stylesheet" href="{{ resource this }}">
