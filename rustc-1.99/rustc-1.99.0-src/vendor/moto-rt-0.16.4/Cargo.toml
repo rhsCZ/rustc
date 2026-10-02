@@ -1,0 +1,39 @@
+[dependencies.alloc]
+optional = true
+package = "rustc-std-workspace-alloc"
+version = "1.0.0"
+
+[dependencies.core]
+optional = true
+package = "rustc-std-workspace-core"
+version = "1.0.0"
+
+[features]
+base = []
+libc = []
+rustc-dep-of-std = ["alloc", "core", "libc"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(test)"]
+level = "allow"
+priority = 0
+
+[package]
+authors = ["The Motor OS Project Developers"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+description = "Motor OS Runtime."
+edition = "2024"
+keywords = ["motor", "motor-os"]
+license = "MIT OR Apache-2.0"
+name = "moto-rt"
+readme = "README.md"
+repository = "https://github.com/moturus/motor-os"
+resolver = "2"
+version = "0.16.4"

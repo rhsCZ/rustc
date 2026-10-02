@@ -1,0 +1,155 @@
+change-id = 131075
+
+[build]
+submodules = false
+vendor = true
+locked-deps = true
+verbose = VERBOSITY
+profiler = true
+
+rustc = "RUST_BOOTSTRAP_DIR/bin/rustc"
+cargo = "RUST_BOOTSTRAP_DIR/bin/cargo"
+
+build = "DEB_BUILD_RUST_TYPE"
+host = ["DEB_HOST_RUST_TYPE"]
+target = ["DEB_TARGET_RUST_TYPE"]
+
+#full-bootstrap = true
+# originally needed to work around #45317 but no longer necessary
+# currently we have to omit it because it breaks #48319
+
+# this might get changed later by override_dh_auto_configure-indep
+# we do it this way to avoid spurious rebuilds
+docs = false
+
+exclude = [
+    # These are for upstream; they are used to catch accidental fixes.
+    "tests/crashes",
+    # Launchpad/sbuild runs the build as root in the chroot, which makes
+    # these permission- and process-limit-dependent tests produce false
+    # negatives compared to upstream's non-root CI assumptions.
+    "tests/rustdoc-ui/issues/issue-98690.rs",
+    "tests/run-make/inaccessible-temp-dir",
+    "tests/run-make/incremental-finalize-fail",
+    "tests/run-make/libtest-thread-limit",
+    "tests/run-make/rustdoc-io-error",
+    # When running the selfbuild autopkgtest we skip resource-intensive
+    # tests that aren't crucial to basic compiler functionality since
+    # we're just ensuring we can build a functional compiler, not
+    # testing the compiler itself
+ifelse(RUST_TEST_SELFBUILD, , ,`
+    "tests/assembly-llvm",
+    "tests/auxiliary",
+    "tests/codegen-llvm",
+    "tests/codegen-units",
+    "tests/coverage-run-rustdoc",
+    "tests/crashes",
+    "tests/debuginfo",
+    "tests/incremental",
+    "tests/mir-opt",
+    "test/pretty",
+    "tests/run-make",
+    "tests/run-make-cargo",
+    "tests/rustdoc",
+    "tests/rustdoc-gui",
+    "tests/rustdoc-js",
+    "tests/rustdoc-js-std",
+    "tests/rustdoc-json",
+    "tests/rustdoc-ui",'
+    "tests/ui",
+    "tests/ui-fulldeps",
+)dnl
+]
+
+# Disable building tools if running selfbuild autopkgtest to save
+# time and resources
+extended = ifelse(RUST_TEST_SELFBUILD, , `true', `false')
+tools = [
+    "cargo",
+    "clippy",
+    "rustfmt",
+    "rustdoc",
+    "rust-analyzer-proc-macro-srv",
+    "wasm-component-ld",
+    "miri",
+    "cargo-miri"
+]
+
+# we use pre-built LLVM, so can't optimize compiler-rt
+optimized-compiler-builtins = false
+
+[install]
+prefix = "/usr/lib/rust-RUST_VERSION"
+
+[target.DEB_BUILD_RUST_TYPE]
+llvm-config = "LLVM_DESTDIR/usr/lib/llvm-LLVM_VERSION/bin/llvm-config"
+linker = "DEB_BUILD_GNU_TYPE-gcc"
+PROFILER_PATH
+
+ifelse(DEB_BUILD_RUST_TYPE,DEB_HOST_RUST_TYPE,,
+[target.DEB_HOST_RUST_TYPE]
+llvm-config = "LLVM_DESTDIR/usr/lib/llvm-LLVM_VERSION/bin/llvm-config"
+linker = "DEB_HOST_GNU_TYPE-gcc"
+PROFILER_PATH
+
+)dnl
+ifelse(DEB_BUILD_RUST_TYPE,DEB_TARGET_RUST_TYPE,,DEB_HOST_RUST_TYPE,DEB_TARGET_RUST_TYPE,,
+[target.DEB_TARGET_RUST_TYPE]
+llvm-config = "LLVM_DESTDIR/usr/lib/llvm-LLVM_VERSION/bin/llvm-config"
+linker = "DEB_TARGET_GNU_TYPE-gcc"
+PROFILER_PATH
+
+)dnl
+[target.wasm32-wasi]
+wasi-root = "/usr"
+profiler = false
+[target.wasm32-wasip1]
+wasi-root = "/usr"
+profiler = false
+[target.wasm32-wasip2]
+wasi-root = "/usr"
+profiler = false
+[target.wasm32-unknown-unknown]
+profiler = false
+
+ifelse(WINDOWS_ARCH,,,
+[target.WINDOWS_ARCH-pc-windows-gnu]
+profiler = false
+
+)dnl
+
+[llvm]
+download-ci-llvm = false
+link-shared = true
+enzyme = false
+ninja = false
+
+[rust]
+jemalloc = false
+optimize = MAKE_OPTIMISATIONS
+dist-src = false
+lld = false
+remap-debuginfo = false
+
+channel = "RELEASE_CHANNEL"
+download-rustc = false
+# parallel codegen interferes with reproducibility, see
+# https://github.com/rust-lang/rust/issues/34902#issuecomment-319463586
+#codegen-units = 0
+# Single codegen unit during selfbuild autopkgtest to save resources
+ifelse(RUST_TEST_SELFBUILD, , , `codegen-units = 1')
+# Disable debug info if running selfbuild autopkgtest to save time
+# and resources
+debuginfo-level = ifelse(RUST_TEST_SELFBUILD, , `2', `0')
+debuginfo-level-std = ifelse(RUST_TEST_SELFBUILD, , `2', `0')
+rpath = false
+
+omit-git-hash = true
+verbose-tests = true
+backtrace-on-ice = true
+
+deny-warnings = false
+
+# Disable codegen tests for selfbuild autopkgtest to save time and
+# resources
+codegen-tests = ifelse(RUST_TEST_SELFBUILD, , `true', `false')

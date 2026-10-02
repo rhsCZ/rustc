@@ -1,0 +1,36 @@
+[dependencies.alloc]
+optional = true
+package = "rustc-std-workspace-alloc"
+version = "1.0"
+
+[dependencies.core]
+optional = true
+package = "rustc-std-workspace-core"
+version = "1.0"
+
+[features]
+default = ["std"]
+rustc-dep-of-std = ["core", "alloc"]
+std = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["no-std", "wasm"]
+description = "WASIp1 API bindings for Rust"
+documentation = "https://docs.rs/wasi"
+edition = "2018"
+keywords = ["webassembly", "wasm"]
+license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
+name = "wasip1"
+readme = "README.md"
+repository = "https://github.com/bytecodealliance/wasi"
+resolver = "2"
+rust-version = "1.82.0"
+version = "1.0.0"

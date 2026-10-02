@@ -1,0 +1,45 @@
+[dependencies.bytecheck]
+default-features = false
+optional = true
+version = "0.8"
+
+[dependencies.bytemuck-1]
+default-features = false
+optional = true
+package = "bytemuck"
+version = "1"
+
+[dependencies.zerocopy]
+default-features = false
+optional = true
+version = "0.8"
+
+[dependencies.zerocopy-derive]
+default-features = false
+optional = true
+version = "0.8"
+
+[features]
+default = []
+zerocopy-0_8 = ["dep:zerocopy", "dep:zerocopy-derive"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Koloski <djkoloski@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["encoding", "no-std"]
+description = "Cross-platform, endian-aware primitives for Rust"
+documentation = "https://docs.rs/rend"
+edition = "2021"
+keywords = ["endian", "no_std"]
+license = "MIT"
+name = "rend"
+readme = "README.md"
+repository = "https://github.com/djkoloski/rend"
+version = "0.5.3"

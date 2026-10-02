@@ -1,0 +1,33 @@
+[dependencies.munge_macro]
+default-features = false
+version = "=0.4.7"
+
+[dev-dependencies.rustversion]
+default-features = false
+version = "1"
+
+[dev-dependencies.trybuild]
+default-features = false
+version = "1"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Koloski <djkoloski@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["no-std", "no-std::no-alloc", "rust-patterns"]
+description = "Macro for custom destructuring"
+documentation = "https://docs.rs/munge"
+edition = "2021"
+keywords = ["macro", "no_std"]
+license = "MIT"
+name = "munge"
+readme = "README.md"
+repository = "https://github.com/djkoloski/munge"
+rust-version = "1.81"
+version = "0.4.7"

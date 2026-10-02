@@ -1,0 +1,41 @@
+[dev-dependencies.tempfile]
+version = "3.21.0"
+
+[features]
+default = ["unstable_admin"]
+nightly = []
+unstable_admin = []
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Lzu Tao <taolzu@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["api-bindings", "os::windows-apis"]
+description = "library for working with NTFS junctions"
+edition = "2021"
+exclude = ["/.github", "/HOW-TO-RELEASE.md"]
+keywords = ["junction", "symlink"]
+license = "MIT"
+name = "junction"
+readme = "README.md"
+repository = "https://github.com/tesuji/junction"
+rust-version = "1.71"
+version = "1.4.2"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-pc-windows-msvc"]
+
+[target."cfg(windows)".dependencies.scopeguard]
+default-features = false
+version = "1"
+
+[target."cfg(windows)".dependencies.windows-sys]
+default-features = false
+features = ["Win32_System_Ioctl", "Win32_System_SystemServices", "Win32_Foundation", "Win32_Security", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_Threading"]
+version = ">=0.59, <=0.61"

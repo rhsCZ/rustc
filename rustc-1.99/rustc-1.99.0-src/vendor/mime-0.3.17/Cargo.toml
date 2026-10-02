@@ -1,0 +1,15 @@
+[dependencies]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["Sean McArthur <sean@seanmonstar.com>"]
+description = "Strongly Typed Mimes"
+documentation = "https://docs.rs/mime"
+keywords = ["mime", "media-extensions", "media-types"]
+license = "MIT OR Apache-2.0"
+name = "mime"
+readme = "README.md"
+repository = "https://github.com/hyperium/mime"
+version = "0.3.17"

@@ -1,0 +1,55 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Thu, 01 Oct 2026 17:30:00 +0200
+Source: rustc-1.99
+Built-For-Profiles: noudeb
+Architecture: source
+Version: 1.99.0+dfsg-24.04.0ubuntu1
+Distribution: noble
+Urgency: medium
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Changed-By: Jan Hodouš <rhscz@post.cz>
+Changes:
+ rustc-1.99 (1.99.0+dfsg-24.04.0ubuntu1) noble; urgency=medium
+ .
+   * Rebase Ubuntu rustc packaging onto upstream 1.99.0.
+   * Carry forward the 1.98.0 Debian/Ubuntu packaging as the initial 1.99.0
+     base.
+Checksums-Sha1:
+ 72c619aac2d2de21027ab69251e8c3239d142328 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
+ b2d5c232fa3de77f77f5c4c4d51341aaca5e0e79 42820116 rustc-1.99_1.99.0+dfsg.orig-vendor.tar.xz
+ d1d14839f6e57b6702d121ca1039c71394c24918 56422200 rustc-1.99_1.99.0+dfsg.orig.tar.xz
+ 810baee1882aaeb240bd25edab9ac3d9afebba06 148520 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.debian.tar.xz
+ 477b38b295bb3299efa148ec88628a8be015105f 10583 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1_source.buildinfo
+Checksums-Sha256:
+ 77a6285c113a87e1c6d2fe38f6d7eee3195d16156931cded9a4b9662f76149c6 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
+ 28e279147b2f3dd288b016e733ea1d9d566b0c6ee914267aecb4ac73288b4c7f 42820116 rustc-1.99_1.99.0+dfsg.orig-vendor.tar.xz
+ b5fd1740613b5fab3180624ef6e346290c036b2adc29614cdf576561fd03c25c 56422200 rustc-1.99_1.99.0+dfsg.orig.tar.xz
+ 77178f51fbf413e86a2cc80d6f3e305ccaf2a9955d08d51b8dab93e530c8f050 148520 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.debian.tar.xz
+ 2d6eb8d529539f6bdc3f743b427869ccec6632d4948f9b058f2af9bb139aca62 10583 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1_source.buildinfo
+Files:
+ 65b7b36af0059558d332edd570458383 21086 devel optional rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
+ 7b254bcac624484733a3e4e83b1c9c01 42820116 devel optional rustc-1.99_1.99.0+dfsg.orig-vendor.tar.xz
+ 30397fa22a6e5cb80319e90446ec3e7e 56422200 devel optional rustc-1.99_1.99.0+dfsg.orig.tar.xz
+ 15eb8b715f7c23a463f9cea70a3dd7bd 148520 devel optional rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.debian.tar.xz
+ 03c45c3a5d09a180fded680be996ba5a 10583 devel optional rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1_source.buildinfo
+Original-Maintainer: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/sNYACgkQbjGunhIC
+qWAt/hAAsuHhYJtcDinLDR2guOCsx6CePR5Qsog7lL1nJPXEYGPKafHMTVLhxPAF
+uhEijouOT+RkJXq7YtgjTK6YopclNg15GPi3ZOxzNquoW3KizuCwGr/Ka/kOp+Q9
+MRkvGH4DKl8R1+Jrm6bsnP+Q+gf7KOBaf2DSsvBgU51hsmtVhF4j5lA+bPQmucSe
+5eHhtmRmyBE+UecOhoqcYfxTWKGL4E8GiDMaehw1iK3HM8SpDjnkjzaXLbOH4GpK
+4dugxV+ng4+ED7yXtEB3B+aNFSkLn53JXSDgLJb3Gs9vTJahsejJ6rRufaNWc7KA
+C+jElXjpCAHP5zxK/Svx7QDVZtodv1gbufIQ/D1tynV+hexC35kwEkgdj3Qs6U9H
+7WlBwJE9FR1yPyzyqmDLRqprKfN+tTDn6NsSHiVHFzU3huZWAlzQflFcOGx3PWy7
+QTzu9mh8/Ryxfq8RiqYVYVG7ys465Hfl14+pkzwpQAWakHhEPo2AnCpaUoQc37WE
+6s9CpbZQhd2iIErlUzgjbnj4ZSfSwTtEiyvNgs6RZ7Uxh8zh1/qjGbk5L9pjtSpp
+Cs3ZEZPTlVONr50/z7e69GX4rEgWlMzl1K9JTWdibWsT63KKoiLJgZ1uLFklZqcc
+OhSSS0hH/A80N8Uy7FRuUR2pSNttKxn9LrkNm8O/R6r2aCdAHaM=
+=7nUx
+-----END PGP SIGNATURE-----

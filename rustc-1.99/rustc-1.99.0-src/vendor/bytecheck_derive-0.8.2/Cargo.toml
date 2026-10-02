@@ -1,0 +1,34 @@
+[dependencies.proc-macro2]
+default-features = false
+version = "1"
+
+[dependencies.quote]
+default-features = false
+version = "1"
+
+[dependencies.syn]
+default-features = false
+features = ["clone-impls", "derive", "full", "parsing", "printing", "proc-macro"]
+version = "2"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Koloski <djkoloski@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["encoding", "no-std", "no-std::no-alloc"]
+description = "Derive macro for bytecheck"
+documentation = "https://docs.rs/bytecheck_derive"
+edition = "2021"
+keywords = ["no_std", "validation", "serialization"]
+license = "MIT"
+name = "bytecheck_derive"
+readme = "README.md"
+repository = "https://github.com/rkyv/bytecheck"
+rust-version = "1.81"
+version = "0.8.2"

@@ -1,0 +1,47 @@
+[dependencies.bytecheck_derive]
+default-features = false
+version = "=0.8.2"
+
+[dependencies.ptr_meta]
+default-features = false
+version = "0.3"
+
+[dependencies.rancor]
+default-features = false
+version = "0.1"
+
+[dependencies.simdutf8]
+default-features = false
+optional = true
+version = "0.1"
+
+[dependencies.uuid-1]
+default-features = false
+optional = true
+package = "uuid"
+version = "1"
+
+[features]
+default = ["simdutf8"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Koloski <djkoloski@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["encoding", "no-std", "no-std::no-alloc"]
+description = "Memory validation framework for Rust"
+documentation = "https://docs.rs/bytecheck"
+edition = "2021"
+keywords = ["no_std", "validation", "serialization"]
+license = "MIT"
+name = "bytecheck"
+readme = "README.md"
+repository = "https://github.com/rkyv/bytecheck"
+rust-version = "1.81"
+version = "0.8.2"

@@ -1,0 +1,34 @@
+[dependencies.proc-macro2]
+default-features = false
+version = "1"
+
+[dependencies.quote]
+default-features = false
+version = "1"
+
+[dependencies.syn]
+default-features = false
+features = ["clone-impls", "full", "parsing", "printing", "proc-macro"]
+version = "2"
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Koloski <djkoloski@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["no-std", "no-std::no-alloc", "rust-patterns"]
+description = "Macro for custom destructuring"
+documentation = "https://docs.rs/munge_macro"
+edition = "2021"
+keywords = ["macro", "no_std"]
+license = "MIT"
+name = "munge_macro"
+readme = "README.md"
+repository = "https://github.com/djkoloski/munge"
+rust-version = "1.81"
+version = "0.4.7"

@@ -1,0 +1,165 @@
+[dependencies.arrayvec-0_7]
+default-features = false
+optional = true
+package = "arrayvec"
+version = "0.7"
+
+[dependencies.bytecheck]
+default-features = false
+features = ["simdutf8"]
+optional = true
+version = "0.8"
+
+[dependencies.bytes-1]
+default-features = false
+optional = true
+package = "bytes"
+version = "1"
+
+[dependencies.hashbrown]
+default-features = false
+optional = true
+version = "0.17"
+
+[dependencies.hashbrown-0_14]
+default-features = false
+optional = true
+package = "hashbrown"
+version = "0.14"
+
+[dependencies.hashbrown-0_15]
+default-features = false
+optional = true
+package = "hashbrown"
+version = "0.15"
+
+[dependencies.hashbrown-0_16]
+default-features = false
+optional = true
+package = "hashbrown"
+version = "0.16"
+
+[dependencies.indexmap-2]
+default-features = false
+optional = true
+package = "indexmap"
+version = "2"
+
+[dependencies.munge]
+default-features = false
+version = "0.4"
+
+[dependencies.ptr_meta]
+default-features = false
+version = "0.3"
+
+[dependencies.rancor]
+default-features = false
+version = "0.1"
+
+[dependencies.rend]
+default-features = false
+version = "0.5"
+
+[dependencies.rkyv_derive]
+default-features = false
+version = "=0.8.18"
+
+[dependencies.smallvec-1]
+default-features = false
+optional = true
+package = "smallvec"
+version = "1"
+
+[dependencies.smol_str-0_2]
+default-features = false
+optional = true
+package = "smol_str"
+version = "0.2"
+
+[dependencies.smol_str-0_3]
+default-features = false
+optional = true
+package = "smol_str"
+version = "0.3"
+
+[dependencies.thin-vec-0_2]
+default-features = false
+optional = true
+package = "thin-vec"
+version = "0.2.12"
+
+[dependencies.tinyvec-1]
+default-features = false
+optional = true
+package = "tinyvec"
+version = "1"
+
+[dependencies.triomphe-0_1]
+default-features = false
+optional = true
+package = "triomphe"
+version = "0.1"
+
+[dependencies.uuid-1]
+default-features = false
+optional = true
+package = "uuid"
+version = "1"
+
+[dev-dependencies.ahash]
+version = "0.8"
+
+[dev-dependencies.divan]
+default-features = false
+version = "0.1"
+
+[dev-dependencies.rustversion]
+default-features = false
+version = "1"
+
+[dev-dependencies.trybuild]
+default-features = false
+version = "1"
+
+[features]
+aligned = []
+alloc = ["dep:hashbrown", "tinyvec-1?/alloc", "rancor/alloc"]
+big_endian = []
+bytecheck = ["dep:bytecheck", "rend/bytecheck", "rkyv_derive/bytecheck"]
+default = ["std", "bytecheck"]
+hashbrown-0_17 = ["dep:hashbrown"]
+indexmap-2 = ["dep:indexmap-2", "alloc"]
+little_endian = []
+pointer_width_16 = []
+pointer_width_32 = []
+pointer_width_64 = []
+std = ["alloc", "bytes-1?/std", "indexmap-2?/std", "ptr_meta/std", "uuid-1?/std"]
+triomphe-0_1 = ["dep:triomphe-0_1", "alloc"]
+unaligned = []
+uuid-1 = ["dep:uuid-1", "bytecheck?/uuid-1"]
+
+[lib]
+path = "src/lib.rs"
+
+[package]
+authors = ["David Koloski <djkoloski@gmail.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+categories = ["encoding", "no-std", "no-std::no-alloc"]
+description = "Zero-copy deserialization framework for Rust"
+documentation = "https://docs.rs/rkyv"
+edition = "2021"
+keywords = ["archive", "rkyv", "serialization", "zero-copy", "no_std"]
+license = "MIT"
+name = "rkyv"
+readme = "README.md"
+repository = "https://github.com/rkyv/rkyv"
+rust-version = "1.81"
+version = "0.8.18"
+
+[package.metadata.docs.rs]
+features = ["bytecheck"]

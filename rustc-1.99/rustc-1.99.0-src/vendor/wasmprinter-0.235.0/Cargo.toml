@@ -1,0 +1,75 @@
+[dependencies.anyhow]
+version = "1.0.58"
+
+[dependencies.termcolor]
+version = "1.2.0"
+
+[dependencies.wasmparser]
+default-features = false
+features = ["simd", "std", "simd"]
+version = "0.235.0"
+
+[dev-dependencies]
+
+[features]
+component-model = ["wasmparser/component-model"]
+default = ["component-model"]
+
+[lib]
+path = "src/lib.rs"
+
+[lints.clippy]
+allow_attributes_without_reason = "warn"
+clone_on_copy = "warn"
+manual_strip = "warn"
+map_clone = "warn"
+uninlined_format_args = "warn"
+unnecessary_cast = "warn"
+unnecessary_fallible_conversions = "warn"
+unnecessary_mut_passed = "warn"
+unnecessary_to_owned = "warn"
+
+[lints.clippy.all]
+level = "allow"
+priority = -1
+
+[lints.rust]
+deprecated-safe-2024 = "warn"
+keyword_idents_2024 = "warn"
+missing-unsafe-on-extern = "warn"
+rust-2024-guarded-string-incompatible-syntax = "warn"
+rust-2024-incompatible-pat = "warn"
+rust-2024-prelude-collisions = "warn"
+unsafe-attr-outside-unsafe = "warn"
+unsafe-op-in-unsafe-fn = "warn"
+unsafe_code = "deny"
+unstable_features = "warn"
+unused-lifetimes = "warn"
+unused-macro-rules = "warn"
+unused_extern_crates = "warn"
+unused_import_braces = "warn"
+
+[lints.rust.unexpected_cfgs]
+check-cfg = ["cfg(fuzzing)"]
+level = "warn"
+priority = 0
+
+[package]
+authors = ["Alex Crichton <alex@alexcrichton.com>"]
+autobenches = false
+autobins = false
+autoexamples = false
+autolib = false
+autotests = false
+description = """
+Rust converter from the WebAssembly binary format to the text format.
+"""
+documentation = "https://docs.rs/wasmprinter"
+edition = "2021"
+homepage = "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmprinter"
+license = "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT"
+name = "wasmprinter"
+readme = "README.md"
+repository = "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasmprinter"
+rust-version = "1.76.0"
+version = "0.235.0"
