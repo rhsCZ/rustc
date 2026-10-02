@@ -1,0 +1,136 @@
+ dpkg-buildpackage -d -us -uc -ui -S
+dpkg-buildpackage: info: source package rustc-1.98
+dpkg-buildpackage: info: source version 1.98.1+dfsg-24.04.0ubuntu1
+dpkg-buildpackage: info: source distribution noble
+dpkg-buildpackage: info: source changed by Jan Hodouš <rhscz@post.cz>
+ dpkg-source --before-build .
+dpkg-source: info: using options from rustc-1.98.1-src/debian/source/options: --include-removal --extend-diff-ignore=((^|/)vendor/|(^|/)stage0/|\.bak$)
+dpkg-source: info: using patch list from debian/patches/series
+dpkg-source: info: applying cargo/c-2002_disable-net-tests.patch
+dpkg-source: info: applying cargo/c-2003-workaround-qemu-vfork-command-not-found.patch
+dpkg-source: info: applying cargo/c-2200-workaround-x32-test.patch
+dpkg-source: info: applying cargo/c-disable-fs-specific-test.patch
+dpkg-source: info: applying cargo/c-0003-tests-add-missing-cross-disabled-checks.patch
+dpkg-source: info: applying cargo/d-0012-cargo-always-return-dev-channel.patch
+dpkg-source: info: applying upstream/u-ignore-ppc-hangs.patch
+dpkg-source: info: applying upstream/u-rustc-llvm-cross-flags.patch
+dpkg-source: info: applying upstream/d-ignore-test_arc_condvar_poison-ppc.patch
+dpkg-source: info: applying upstream/d-disable-download-tests.patch
+dpkg-source: warning: unexpected end of diff 'rustc-1.98.1-src/debian/patches/prune/d-0000-ignore-removed-submodules.patch'
+dpkg-source: info: applying prune/d-0000-ignore-removed-submodules.patch
+dpkg-source: info: applying prune/d-0001-pkg-config-no-special-snowflake.patch
+dpkg-source: info: applying prune/d-0005-no-jemalloc.patch
+dpkg-source: info: applying prune/d-0010-cargo-remove-vendored-c-crates.patch
+dpkg-source: info: applying vendor/d-0003-cc-psm-rebuild-wasm32.patch
+dpkg-source: info: applying build/d-bootstrap-rustflags.patch
+dpkg-source: info: applying build/d-bootstrap-install-symlinks.patch
+dpkg-source: info: applying build/d-bootstrap-cargo-doc-paths.patch
+dpkg-source: info: applying build/d-bootstrap-use-local-css.patch
+dpkg-source: info: applying build/d-bootstrap-custom-debuginfo-path.patch
+dpkg-source: info: applying build/d-bootstrap-permit-symlink-in-docs.patch
+dpkg-source: info: applying behaviour/d-rust-gdb-paths.patch
+dpkg-source: info: applying behaviour/d-rust-lldb-paths.patch
+dpkg-source: info: applying behaviour/d-rustc-add-soname.patch
+dpkg-source: info: applying behaviour/d-rustc-windows-ssp.patch
+dpkg-source: info: applying behaviour/d-rustdoc-disable-embedded-fonts.patch
+dpkg-source: info: applying ubuntu/ubuntu-ignore-arm-doctest.patch
+dpkg-source: info: applying ubuntu/ubuntu-vendor-no-workspace.patch
+dpkg-source: info: applying ubuntu/ubuntu-use-system-compiler-during-tests.patch
+dpkg-source: info: applying vendor/blake3-no-embedded-c.patch
+dpkg-source: info: applying build/d-disable-git-bootstrap-tests.patch
+dpkg-source: info: applying build/d-bootstrap-tests-restrict-defaults.patch
+dpkg-source: info: applying ubuntu/ubuntu-s390x-min-arch.patch
+dpkg-source: info: applying ubuntu/ubuntu-allow-stable-miri.patch
+dpkg-source: info: applying ubuntu/ubuntu-miri-no-native-lib.patch
+dpkg-source: info: applying ubuntu/ubuntu-libgit2-1.7.patch
+ debian/rules clean
+/bin/sh: 1: rustc: not found
+dh clean --parallel --with bash-completion
+   debian/rules override_dh_clean
+make[1]: Entering directory '/root/rustc/rustc-1.98.1/rustc-1.98.1-src'
+/bin/sh: 1: rustc: not found
+# dpkg-source insists on version-specific orig tarball names, but for local
+# packaging we allow one shared orig tarball per upstream version and create
+# a symlink for the current Debian version on demand.
+if [ ! -e "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig.tar.xz" ] && [ -n "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig.tar.xz" ]; then \
+	ln -sf "rustc-1.98_1.98.1+dfsg.orig.tar.xz" \
+	       "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig.tar.xz"; \
+fi
+if [ ! -e "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig-vendor.tar.xz" ] && [ -n "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig-vendor.tar.xz" ]; then \
+	ln -sf "rustc-1.98_1.98.1+dfsg.orig-vendor.tar.xz" \
+	       "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig-vendor.tar.xz"; \
+fi
+# The stage0 payload is now carried by rust-stage0-1.95, so keep any
+# leftover local orig-stage0 tarball from being auto-included in source
+# uploads for rustc-1.96.
+if [ -e "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig-stage0.tar.xz" ]; then \
+	mv -f "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig-stage0.tar.xz" \
+	      "/root/rustc/rustc-1.98.1/rustc-1.98.1-src/../rustc-1.98_1.98.1+dfsg.orig-stage0.tar.xz.disabled"; \
+fi
+# Upstream contains a lot of these
+dh_clean -XCargo.toml.orig
+make[1]: Leaving directory '/root/rustc/rustc-1.98.1/rustc-1.98.1-src'
+ dpkg-source -b .
+dpkg-source: warning: upstream signing key but no upstream tarball signature
+dpkg-source: info: using options from rustc-1.98.1-src/debian/source/options: --include-removal --extend-diff-ignore=((^|/)vendor/|(^|/)stage0/|\.bak$)
+dpkg-source: info: using source format '3.0 (quilt)'
+dpkg-source: info: building rustc-1.98 using existing ./rustc-1.98_1.98.1+dfsg.orig-vendor.tar.xz
+dpkg-source: info: building rustc-1.98 using existing ./rustc-1.98_1.98.1+dfsg.orig.tar.xz
+dpkg-source: info: using patch list from debian/patches/series
+dpkg-source: info: building rustc-1.98 in rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1.debian.tar.xz
+dpkg-source: info: building rustc-1.98 in rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1.dsc
+ dpkg-genbuildinfo --build=source -O../rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.buildinfo
+ dpkg-genchanges --build=source -O../rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.changes
+dpkg-genchanges: info: including full source code in upload
+ dpkg-source --after-build .
+dpkg-source: info: using options from rustc-1.98.1-src/debian/source/options: --include-removal --extend-diff-ignore=((^|/)vendor/|(^|/)stage0/|\.bak$)
+dpkg-source: info: unapplying ubuntu/ubuntu-libgit2-1.7.patch
+dpkg-source: info: unapplying ubuntu/ubuntu-miri-no-native-lib.patch
+dpkg-source: info: unapplying ubuntu/ubuntu-allow-stable-miri.patch
+dpkg-source: info: unapplying ubuntu/ubuntu-s390x-min-arch.patch
+dpkg-source: info: unapplying build/d-bootstrap-tests-restrict-defaults.patch
+dpkg-source: info: unapplying build/d-disable-git-bootstrap-tests.patch
+dpkg-source: info: unapplying vendor/blake3-no-embedded-c.patch
+dpkg-source: info: unapplying ubuntu/ubuntu-use-system-compiler-during-tests.patch
+dpkg-source: info: unapplying ubuntu/ubuntu-vendor-no-workspace.patch
+dpkg-source: info: unapplying ubuntu/ubuntu-ignore-arm-doctest.patch
+dpkg-source: info: unapplying behaviour/d-rustdoc-disable-embedded-fonts.patch
+dpkg-source: info: unapplying behaviour/d-rustc-windows-ssp.patch
+dpkg-source: info: unapplying behaviour/d-rustc-add-soname.patch
+dpkg-source: info: unapplying behaviour/d-rust-lldb-paths.patch
+dpkg-source: info: unapplying behaviour/d-rust-gdb-paths.patch
+dpkg-source: info: unapplying build/d-bootstrap-permit-symlink-in-docs.patch
+dpkg-source: info: unapplying build/d-bootstrap-custom-debuginfo-path.patch
+dpkg-source: info: unapplying build/d-bootstrap-use-local-css.patch
+dpkg-source: info: unapplying build/d-bootstrap-cargo-doc-paths.patch
+dpkg-source: info: unapplying build/d-bootstrap-install-symlinks.patch
+dpkg-source: info: unapplying build/d-bootstrap-rustflags.patch
+dpkg-source: info: unapplying vendor/d-0003-cc-psm-rebuild-wasm32.patch
+dpkg-source: info: unapplying prune/d-0010-cargo-remove-vendored-c-crates.patch
+dpkg-source: info: unapplying prune/d-0005-no-jemalloc.patch
+dpkg-source: info: unapplying prune/d-0001-pkg-config-no-special-snowflake.patch
+dpkg-source: info: unapplying prune/d-0000-ignore-removed-submodules.patch
+dpkg-source: info: unapplying upstream/d-disable-download-tests.patch
+dpkg-source: info: unapplying upstream/d-ignore-test_arc_condvar_poison-ppc.patch
+dpkg-source: info: unapplying upstream/u-rustc-llvm-cross-flags.patch
+dpkg-source: info: unapplying upstream/u-ignore-ppc-hangs.patch
+dpkg-source: info: unapplying cargo/d-0012-cargo-always-return-dev-channel.patch
+dpkg-source: info: unapplying cargo/c-0003-tests-add-missing-cross-disabled-checks.patch
+dpkg-source: info: unapplying cargo/c-disable-fs-specific-test.patch
+dpkg-source: info: unapplying cargo/c-2200-workaround-x32-test.patch
+dpkg-source: info: unapplying cargo/c-2003-workaround-qemu-vfork-command-not-found.patch
+dpkg-source: info: unapplying cargo/c-2002_disable-net-tests.patch
+dpkg-buildpackage: info: source-only upload (original source is included)
+Use of uninitialized value $ENV{"DEBEMAIL"} in pattern match (m//) at /usr/bin/debuild line 1071.
+Now signing changes and any dsc files...
+long key IDs are discouraged; please use key fingerprints instead
+ signfile dsc rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1.dsc 6E31AE9E1202A960
+
+ fixup_buildinfo rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1.dsc rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.buildinfo
+ signfile buildinfo rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.buildinfo 6E31AE9E1202A960
+
+ fixup_changes dsc rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1.dsc rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.changes
+ fixup_changes buildinfo rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.buildinfo rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.changes
+ signfile changes rustc-1.98_1.98.1+dfsg-24.04.0ubuntu1_source.changes 6E31AE9E1202A960
+
+Successfully signed dsc, buildinfo, changes files
