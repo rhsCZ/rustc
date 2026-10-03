@@ -6,14 +6,14 @@ Source: rustc-1.99
 Architecture: source
 Version: 1.99.0+dfsg-24.04.0ubuntu1
 Checksums-Md5:
- 65b7b36af0059558d332edd570458383 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
+ 166be2d6c7fd6e296016ed8b1e4201de 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
 Checksums-Sha1:
- 72c619aac2d2de21027ab69251e8c3239d142328 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
+ d2de343ddf20da82fd5bc92463642ec62581c57b 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
 Checksums-Sha256:
- 77a6285c113a87e1c6d2fe38f6d7eee3195d16156931cded9a4b9662f76149c6 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
+ 170032f56b2842d615cc0ebf3f2213ac92f91554915dbfd1b1123320fee14b56 21086 rustc-1.99_1.99.0+dfsg-24.04.0ubuntu1.dsc
 Build-Origin: Ubuntu
 Build-Architecture: amd64
-Build-Date: Fri, 02 Oct 2026 15:25:41 +0200
+Build-Date: Fri, 02 Oct 2026 17:53:20 +0200
 Build-Tainted-By:
  merged-usr-via-aliased-dirs
  usr-local-has-libraries
@@ -278,17 +278,17 @@ Environment:
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/sNYACgkQbjGunhIC
-qWAfaQ//copns7HXNf/St5OcqHK0bc8A2HsP/RJ+WYNDfVXNg5Ak5TSly1h57M9T
-g0Ez3VvyuGyJew0CZPPW994+L2uVeF1N9cL8/GBCztto/06iK67KDmk9sR4Q/Ndn
-ZlEXOgPcRQ8QRzot2B8VW0jDlxN1ftEObU0m9+2nvQd1mz2faAqMZaHPS6UhzUTT
-OE1MHLgqbx7UwCzeV5rRwq7Frxdx+uBVI+FrMy9RuL3jShiKA6Yumc8EbZv927w/
-2LZ10m+ZPfoRIus7oawmNYQ3TOefXITMe4IH7OQuluCxB2reeLzUQDVpVZ22I67d
-DTCBb3HH7xV7KgIhjhP5XFF65ixs79IhM3mW2QTFh/6nQKgwD8AV5boNb1umPdNw
-ZiXrigZT3uBwftz+8bJiZq91Q6T8Gx2atSKx5pSzoaVZp5IfxNbBBl3tjXOEeAGo
-1T6WQ/Uneh+TfOZOOCAdp8Q+qm6NiWX3gO14fh459y8lroFBS6lB1sxvPB8+TucV
-ti6mVAbd5HRazW6Hh+LbMIvp5Ra+gCZVWibgOuqWaZW3zNVtXKPaWYF8id+jeklt
-IZgP7o5E9PNYkUCamCIfqRnirPKeVIZsD2UOWXO8+9h5jGrQZmLisvQNCuxlQwb/
-w3mUz90oFrjggqncF4YL/td1YjW0/dhUTZ6JUTwBFoKPV0ye9VU=
-=mOxO
+iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/03wACgkQbjGunhIC
+qWCIRRAAl2swxaQtd6D0T5TVAWuXBeXTp/Ttapc76Ysx6c+IerNONsD0jHbRFY1k
+tidW1F8DfzUC+X8Rg/xNaYeLDktsuJ8FEfI6z9GxsV6jFIeLvICwgaOXwYtp17B6
+hyP9FyPmcZUJ5UxgIHcUbrXyvcENI0NUpb5fZ9vSN9DGTPf/+6aoEeZYbSEYvk+m
+z6a6Dr7tuXsVHmCVNZc56ImDjKWJA4yAptZJkjP+yiJkg1qFyQqPM8jttLawolBn
+KbRonpx2SKHigvdIgNTkqaf2S2CDcRY/SfPTANcRJrqcMgVgbnzrrpNdHah967x/
+AP1yzX4iBRUYhkO67bj/l46hoGO3GBpdReyASC4eDvemXShW3pwd7F3GXANOTRKT
++dQf0Qe99InPjoNOhl0exDPcZEyBdRGK3R1z7OE1nCuLdGdFWoi33lAmal10URtk
+hptXp25/Djpjxdnfj9SmGCiuXmy8pIX2n4/pKmyRiq6b7mg2tnF7pgGc2ly0B7kA
+sM6kvdobp49IMic/Nqc61ZGjWJ1AKTtWfZdBvxa63eDvo+J43YERDsfksIDyrQOY
+ouBgXrdGz4Q2BoUXCc7VQZk81fILazwoWW3js10pFQL1Cuc/pvkMPdOvasNqztnh
+j1g7gThFFRwPyfS3NOF+wCnNyeEskwgrzuKBiyTKXcqexrgzAEo=
+=VTXP
 -----END PGP SIGNATURE-----

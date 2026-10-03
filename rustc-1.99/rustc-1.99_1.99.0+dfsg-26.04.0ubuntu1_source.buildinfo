@@ -6,14 +6,14 @@ Source: rustc-1.99
 Architecture: source
 Version: 1.99.0+dfsg-26.04.0ubuntu1
 Checksums-Md5:
- b742f0e1a40461653656c9dd664d1ed1 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
+ e7097e33be97c6f90d5a03fd215109a0 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
 Checksums-Sha1:
- 9cf3846117d3cf0e7e6f8386fac3d43da9a44b7d 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
+ ffc2d536986b3b5550f25f3fd81f6d1e023d8794 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
 Checksums-Sha256:
- ebfc9ed7dbccf9a29e9931e89e8698ee00688af65a07dadbddba34a0e5cb6351 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
+ 21312f0e7380a49986bd7cb4e8a27b13761ead108a55ab8db53e37b6050cfb9f 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
 Build-Origin: Ubuntu
 Build-Architecture: amd64
-Build-Date: Fri, 02 Oct 2026 15:27:06 +0200
+Build-Date: Fri, 02 Oct 2026 17:54:50 +0200
 Build-Tainted-By:
  merged-usr-via-aliased-dirs
  usr-local-has-libraries
@@ -278,17 +278,17 @@ Environment:
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/sSsACgkQbjGunhIC
-qWAIYBAAhI0orgKKq+YHxIZUe9I02uWLP1l/Jl55mds9NXD3v8nN/zxzPtDS0hmW
-zp3+FBVIQWnXHZjqdSWonRuq8In9K2z8Xo7Xau6nfapJIS/xlLBCiZUh0O+12rg3
-OeAP9kU9OJt6qimlZf/ZctGz5avanWzPNGA6OI2VQbxgHd8idrATQNWaKgh8Uwou
-qRQqtMxAzzys/6KNtDj7OkHYlWCVyONUQs5oscjV/x7PI3zPslFkcCV9xc8K3WAw
-KwKvZb5W6pAS0iefM6o/nY6h7F8DIpqwO+FKfqW/S6l1aQ0Bnq2YcK/bNac5ZqiM
-OvGQv6+SLgIUZ0bs+baMu1KQ7NT2eJg0o6YxwkofZkCqSzMr/L8y4TGs0wVX6NLf
-+MDVTsSdNHR9fwz97yn3IQO8dzuXqBMCP30xvpLRg5hrJO9K4IPAeHTquzzQOb6Y
-zDw0MtFIqt39YnZihuL9O1YAbJQ7dBr7hYPj4jSLDuo1rT5DR8W6HzbPw4pXaM+8
-9g6yi4zi/g2eWTzv6r/A/AXSycPY/ip5GSsswJeQpKfZ1BUHGgsXYcKa5I7Kg4tv
-Q6rW92GFtwhMI0fBs9ObgcmdxvtXwcwtRY+KgMz7ER+X6EvS/fnvHFxYCJ/eAyUr
-hO8MVdDo2u6NxyNJoIc9CxtVbXFbMP42uZb9AxbuVDrAWf8DiKc=
-=b7HP
+iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/08sACgkQbjGunhIC
+qWBfxxAAik1e/jlaK8VWQUt9Plb5KstgKtJKem+qnu/v3yhv3ApRISiUomEVDV8G
+jTEFNqS/trKC1387GTbpnBiXhvfvvaiR5DLLRxpBrbFR/LLxkq6A4SxXUhuKNrJA
+Sujhd3MivGkyaXUnANFNRf8wbAuSa5Bzc0276MGiH42NRBfBpNafjFr/TyQql2T4
+Bh6pluLobrTa8nZ8U9xj2UQJWLbCzzYZ+0t0XuMl9oF+proJtrCuClFsoo5ZZ0AY
+kHBtOiYX7rSGONV1OIwhLlsExL24waDrIrPGp/JIbGwOHzP94thznW0lXz80ee7v
+FlxKNv5ZZtMrazn4BCzvJlxO9e+bXH6mJR8xY1MkKo1HQb+tAew4wvOfm7BOaXKH
+KEAhyjjqyhB6Mrc/HAMQymDW0Aa6t8S5kJKDx+LwFMntWAYIgpZ057k5AizQqPkK
+leuT2R/V467OKmKwnmW7S8o2j2pIFVkZDMzAJvP/sORkfc83fvo7svoV32uTyzuf
+6kb7iGPzsgQis/onre02Tb3IrLYUJHFGBkoKIYi1+JIZCfMSyFySRflak/Trskmn
+8mCmZyA1cWe+RbNZiLHXshBunFGhDApRy+7hnm7gFM70iUKL3X1NIUvKuJCADRbf
+ysWVcPrgwe1q0qZ0HQiNDqUu85uQWZ3pTV+PSEZxz4ygM1FXvu8=
+=UIir
 -----END PGP SIGNATURE-----

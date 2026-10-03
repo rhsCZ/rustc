@@ -18,38 +18,38 @@ Changes:
    * Carry forward the 1.98.0 Debian/Ubuntu packaging as the initial 1.99.0
      base.
 Checksums-Sha1:
- 9cf3846117d3cf0e7e6f8386fac3d43da9a44b7d 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
+ ffc2d536986b3b5550f25f3fd81f6d1e023d8794 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
  b2d5c232fa3de77f77f5c4c4d51341aaca5e0e79 42820116 rustc-1.99_1.99.0+dfsg.orig-vendor.tar.xz
  d1d14839f6e57b6702d121ca1039c71394c24918 56422200 rustc-1.99_1.99.0+dfsg.orig.tar.xz
- 3e85d512197155373fa81dc6761f0e341c541d52 148500 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.debian.tar.xz
- 73d23c78ec34cb1ba5413cdca23ba2a2ff6cbeb6 10583 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1_source.buildinfo
+ bd97f16976efb5f6099309a03a1f668de2a6f155 148496 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.debian.tar.xz
+ 437092d292246da0776035b64b3ba055d754c443 10583 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1_source.buildinfo
 Checksums-Sha256:
- ebfc9ed7dbccf9a29e9931e89e8698ee00688af65a07dadbddba34a0e5cb6351 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
+ 21312f0e7380a49986bd7cb4e8a27b13761ead108a55ab8db53e37b6050cfb9f 21086 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
  28e279147b2f3dd288b016e733ea1d9d566b0c6ee914267aecb4ac73288b4c7f 42820116 rustc-1.99_1.99.0+dfsg.orig-vendor.tar.xz
  b5fd1740613b5fab3180624ef6e346290c036b2adc29614cdf576561fd03c25c 56422200 rustc-1.99_1.99.0+dfsg.orig.tar.xz
- 6f249881cc4ed96e4cd90c70adb426525ab08f97d028eda2f1a2269f5c0f9da3 148500 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.debian.tar.xz
- 084a65b3cbd14fdc67ca9505717dc79687471342a5479d4190f2bf1262c18a1b 10583 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1_source.buildinfo
+ 4c7e1c8613c9fda94aab9fa6d60a78d5301907ca3be7576ac69de59c3890affc 148496 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.debian.tar.xz
+ eec5856f69777525ec1ed31ea3f90573e0281130db97ce8a7e89d3cdd3f2abd9 10583 rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1_source.buildinfo
 Files:
- b742f0e1a40461653656c9dd664d1ed1 21086 devel optional rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
+ e7097e33be97c6f90d5a03fd215109a0 21086 devel optional rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.dsc
  7b254bcac624484733a3e4e83b1c9c01 42820116 devel optional rustc-1.99_1.99.0+dfsg.orig-vendor.tar.xz
  30397fa22a6e5cb80319e90446ec3e7e 56422200 devel optional rustc-1.99_1.99.0+dfsg.orig.tar.xz
- cf2943b426a0142a1dfa264618bf3a1a 148500 devel optional rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.debian.tar.xz
- daea2a1358f6b54e6be212d1acf2676d 10583 devel optional rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1_source.buildinfo
+ fe7f016480a5e9c7863172c83dbf07b4 148496 devel optional rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1.debian.tar.xz
+ ded4767f47e31ead1a461f0f72de094d 10583 devel optional rustc-1.99_1.99.0+dfsg-26.04.0ubuntu1_source.buildinfo
 Original-Maintainer: Debian Rust Maintainers <pkg-rust-maintainers@alioth-lists.debian.net>
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/sSwACgkQbjGunhIC
-qWDbdA//WBQHZ/Rh3DiI0/jd/veFwWOF0r6UrkGPjgryeMnyHEcO41PX6Rn3jxBu
-w5IvO4TxlRZ9q3uN+MAa1eF/D31YJITKGEaG60WDO8Xhr7ZvOwuPVq9ZKTdrxmdy
-yGFlw8QBHjiT6L1LeW2ulHPUDeRGRPQqGUNaU6gQfNFETlnVMk+N6XHxzbUYDTHP
-+I+HfT8AOSzYx3tEJFtlxnj7oUdXTX4AQ3W4GwoX+Bl3wQ1wnXfxR4KuLRE9xDxv
-CcTSJbIHy+yFD5QVFvcwLOtSYgKs0R3HRRZQKO/wKt3IQyiMip3rLnE0qout1ThI
-fv26WauLh1lGboW2aY07evn/U+sHX1O4hgnr7nfQV8uwfBv5cUZJ3YU4DDEt5XQS
-tFAmBJNEOji3D0aQ5gLjFFI6uF2wYKHcQqRRc0tv/DgVP3pnOFdRJocdbgptIgYi
-zy4UyOp7XFf5V9j9puDI739Pe/QO6JuIoBneJLXzKoM4n5AmlIZfKryZO0ZQbZ8w
-brrhIGvZGV0zLZQ5P7A4mvZHmZythmvZCLMcVNXMHWgnFeUCue7i6nyqIgK2ShLv
-fRGl+B88zdvlyI/lBBTDg4QttBkv9IpIPW9tbi8jyXVAfE5lxFIvstM1sqUkkbAS
-MHcgHvUT5ibWSrgjSiUCwLK/Jxc+qmxJc3tFyiX6X6Hj7abEM6c=
-=wv/a
+iQIzBAEBCgAdFiEEBA4y7RgfpWqP10UabjGunhICqWAFAmq/08sACgkQbjGunhIC
+qWB4Kw//QJGurAGI4CV1EM4G3hf3l+0l/U3pxOhG5hINddRKEg9S5XCzGtNdPlEm
+fwe/NiHkslZ3ALOhYSng4/jOTsD8kdE93P2rujhYh1IF3WYDjU1dqKQ5/2WiuoPj
+0wW377xiBNvPDf1GmU7432LP/3N/m6ksRPNQFh7xeNmCZr3hXTbEOP5LYzNwkBJw
+X3EKxVW5to18ASpKDyuGaio5Xy86qwwcULQaORwIP5bCaZpLH4Ou6zToPL6D53+z
+ERabEe6BzDDgj+nj5gSz6yOl6KssrY+Pmvw44u0WXWA2osQdwsxoAistb6kNHW7p
+wJISUKpL+8tb38LA/dinGXirwuBKcA6hPvY42HHYs38O7zjksnq6Vc8MZ+HVQ6CE
+HvwlG5GgzSqs3kj0nPmCWRKYoFxopcnkMocT2dCVkpRCJF3+hcrx0qFqR3JCHJPy
+/kKarrpQMZIJ0mJidFjPD/LXooQg7hrGNIlHrfyI8scqNvvWzss+sPIgyUSap5ls
+QnWUrpcQPPr6CWvhjUcrFNinwqEprLHW1w7PRGc1O6q0rNppEkiDbkBckO/5B6gt
+ZhvYdkLfH1k+LBo+cgC2/OtugkovFgR6MsEg4lvqDUI+STufxjRrxxmfaEZWh0Y9
+CZt7loa7T+11d7U4BcKC1sXXbNvAO7RQdO4TPv9KOPQjgxqvnJo=
+=eYCv
 -----END PGP SIGNATURE-----
